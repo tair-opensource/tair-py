@@ -1,0 +1,80 @@
+name: Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test-ubuntu-with-redis-62:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: clone and make redis
+        run: |
+          sudo apt-get install git
+          git clone https://github.com/redis/redis
+          cd redis
+          git checkout 6.2.0
+          make -j
+
+      - name: clone and make tairhash
+        run: |
+          git clone https://github.com/alibaba/TairHash.git
+          cd TairHash
+          mkdir build
+          cd build
+          cmake ../
+          make -j
+
+      - name: clone and make tairstring
+        run: |
+          git clone https://github.com/alibaba/TairString.git
+          cd TairString
+          mkdir build
+          cd build
+          cmake ../
+          make -j
+
+      - name: clone and make tairzset
+        run: |
+          git clone https://github.com/alibaba/TairZset.git
+          cd TairZset
+          mkdir build
+          cd build
+          cmake ../
+          make -j
+
+      - name: start redis and redis cluster with loadmodule
+        run: |
+          work_path=$(pwd)
+          tairhash_path=${work_path}/TairHash/lib/tairhash_module.so
+          tairstring_path=${work_path}/TairString/lib/tairstring_module.so
+          tairzset_path=${work_path}/TairZset/lib/tairzset_module.so
+          echo "loadmodule ${tairhash_path}" >> redis/redis.conf
+          echo "loadmodule ${tairstring_path}" >> redis/redis.conf
+          echo "loadmodule ${tairzset_path}" >> redis/redis.conf
+          ./redis/src/redis-server redis/redis.conf &
+
+          # start redis cluster
+          cd redis/utils/create-cluster
+          OPTIONS="--loadmodule ${tairhash_path} --loadmodule ${tairstring_path} --loadmodule ${tairzset_path}"
+          echo ADDITIONAL_OPTIONS="'${OPTIONS}'" > config.sh
+          cat config.sh
+          ./create-cluster start
+          echo yes|./create-cluster create
+
+      - name: set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: install redis-py
+        run: pip install redis
+
+      - name: install pytest
+        run: pip install pytest
+
+      - name: test
+        run: pytest tests/test_tairstring.py tests/test_tairhash.py tests/test_tairzset.py --verbosity=1
