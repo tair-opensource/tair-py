@@ -3,6 +3,7 @@
 [![Test](https://github.com/alibaba/tair-py/actions/workflows/test.yml/badge.svg)](https://github.com/alibaba/tair-py/actions/workflows/test.yml)
 [![Format](https://github.com/alibaba/tair-py/actions/workflows/format.yml/badge.svg)](https://github.com/alibaba/tair-py/actions/workflows/format.yml)
 [![Coverage](https://github.com/alibaba/tair-py/actions/workflows/coverage.yml/badge.svg)](https://github.com/alibaba/tair-py/actions/workflows/coverage.yml)
+[![pypi](https://badge.fury.io/py/tair.svg)](https://pypi.org/project/tair/)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 English | [简体中文](README.zh_CN.md)
@@ -14,6 +15,12 @@ tair-py is a Python client of [Tair](https://help.aliyun.com/document_detail/145
 - [TairZset](https://www.alibabacloud.com/help/en/apsaradb-for-redis/latest/tairzset-commands)
 
 ## Install
+
+Install from pip:
+
+```shell
+pip install tair
+```
 
 Install from source:
 
@@ -46,4 +53,4 @@ Feel free to dive in! [Open an issue](https://github.com/alibaba/tair-py/issues/
 
 ## License
 
-[MIT](LICENSE) © Alibaba
+[MIT](LICENSE)

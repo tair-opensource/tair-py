@@ -4,7 +4,9 @@ from setuptools import setup
 setup(
     name="tair",
     description="Python client for Tair",
-    version="0.0.1",
+    long_description=open("README.md").read().strip(),
+    long_description_content_type="text/markdown",
+    version="0.0.3",
     license="MIT",
     url="https://github.com/alibaba/tair-py",
     author="Vincil Lau",
