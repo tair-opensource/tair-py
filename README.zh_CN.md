@@ -1,12 +1,12 @@
-[English](README.md) | 简体中文
+[English](https://github.com/alibaba/tair-py/blob/main/README.md) | 简体中文
 
 # tair-py
 
 [![Test](https://github.com/alibaba/tair-py/actions/workflows/test.yml/badge.svg)](https://github.com/alibaba/tair-py/actions/workflows/test.yml)
 [![Format](https://github.com/alibaba/tair-py/actions/workflows/format.yml/badge.svg)](https://github.com/alibaba/tair-py/actions/workflows/format.yml)
 [![Coverage](https://github.com/alibaba/tair-py/actions/workflows/coverage.yml/badge.svg)](https://github.com/alibaba/tair-py/actions/workflows/coverage.yml)
-[![pypi](https://badge.fury.io/py/tair.svg)](https://pypi.org/project/tair/)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![pypi](https://badge.fury.io/py/tair.svg)](https://pypi.org/project/tair/)
 
 基于 [redis-py](https://github.com/redis/redis-py) 封装的，[云数据库 Redis 企业版（Tair）](https://help.aliyun.com/document_detail/145956.html)的 Python 客户端。支持 Tair 的以下模块：
 
