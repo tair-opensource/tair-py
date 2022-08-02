@@ -4,6 +4,8 @@ import datetime
 import time
 import uuid
 
+from pytest import approx
+
 from tair import (
     ExhscanResult,
     FieldValueItem,
@@ -533,8 +535,8 @@ class TestTairHash:
         field = "field_" + str(uuid.uuid4())
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2) == 3.3
-        assert t.exhget(key, field) == b"3.3"
+        assert t.exhincrbyfloat(key, field, 2.2) == approx(3.3)
+        assert float(t.exhget(key, field)) == approx(3.3)
 
     def test_exhincrbyfloat_ex(self):
         t = get_tair_client()
@@ -542,7 +544,7 @@ class TestTairHash:
         field = "field_" + str(uuid.uuid4())
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, ex=10) == 3.3
+        assert t.exhincrbyfloat(key, field, 2.2, ex=10) == approx(3.3)
         assert 0 < t.exhttl(key, field) <= 10
 
         # ex should not be a float.
@@ -556,7 +558,7 @@ class TestTairHash:
         ex = datetime.timedelta(seconds=10)
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, ex=ex) == 3.3
+        assert t.exhincrbyfloat(key, field, 2.2, ex=ex) == approx(3.3)
         assert 0 < t.exhttl(key, field) <= 10
 
     def test_exhincrbyfloat_px(self):
@@ -565,7 +567,7 @@ class TestTairHash:
         field = "field_" + str(uuid.uuid4())
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, px=10000) == 3.3
+        assert t.exhincrbyfloat(key, field, 2.2, px=10000) == approx(3.3)
         assert 0 < t.exhpttl(key, field) <= 10000
 
         # px should not be a float.
@@ -579,7 +581,7 @@ class TestTairHash:
         px = datetime.timedelta(milliseconds=10000)
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, px=px) == 3.3
+        assert t.exhincrbyfloat(key, field, 2.2, px=px) == approx(3.3)
         assert 0 < t.exhpttl(key, field) <= 10000
 
     def test_exhincrbyfloat_exat(self):
@@ -590,7 +592,7 @@ class TestTairHash:
         exat = int(time.mktime(expire_at.timetuple()))
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, exat=exat) == 3.3
+        assert t.exhincrbyfloat(key, field, 2.2, exat=exat) == approx(3.3)
         assert 0 < t.exhttl(key, field) <= 10
 
     def test_exhincrbyfloat_exat_timedelta(self):
@@ -600,7 +602,7 @@ class TestTairHash:
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, exat=expire_at) == 3.3
+        assert t.exhincrbyfloat(key, field, 2.2, exat=expire_at) == approx(3.3)
         assert 0 < t.exhttl(key, field) <= 10
 
     def test_exhincrbyfloat_pxat(self):
@@ -611,7 +613,7 @@ class TestTairHash:
         pxat = int(time.mktime(expire_at.timetuple())) * 1000
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, pxat=pxat) == 3.3
+        assert t.exhincrbyfloat(key, field, 2.2, pxat=pxat) == approx(3.3)
         assert 0 < t.exhpttl(key, field) <= 10000
 
     def test_exhincrbyfloat_pxat_timedelta(self):
@@ -621,7 +623,7 @@ class TestTairHash:
         pxat = get_server_time(t) + datetime.timedelta(seconds=10)
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, pxat=pxat) == 3.3
+        assert t.exhincrbyfloat(key, field, 2.2, pxat=pxat) == approx(3.3)
         # due to network delay, pttl may be greater than 10000.
         assert 0 < t.exhpttl(key, field) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
@@ -632,8 +634,8 @@ class TestTairHash:
         field2 = "field_" + str(uuid.uuid4())
 
         assert t.exhset(key, field1, 1.1) == 1
-        assert t.exhincrbyfloat(key, field1, 2.2, ver=1) == 3.3
-        assert t.exhget(key, field1) == b"3.3"
+        assert t.exhincrbyfloat(key, field1, 2.2, ver=1) == approx(3.3)
+        assert float(t.exhget(key, field1)) == approx(3.3)
         assert t.exhver(key, field1) == 2
 
         assert t.exhset(key, field2, 10) == 1
@@ -646,8 +648,8 @@ class TestTairHash:
         field = "field_" + str(uuid.uuid4())
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, abs=100) == 3.3
-        assert t.exhget(key, field) == b"3.3"
+        assert t.exhincrbyfloat(key, field, 2.2, abs=100) == approx(3.3)
+        assert float(t.exhget(key, field)) == approx(3.3)
         assert t.exhver(key, field) == 100
 
     def test_exhincrbyfloat_overflow(self):
@@ -669,7 +671,7 @@ class TestTairHash:
         pxat = int(time.mktime(exat.timetuple())) * 1000
 
         assert t.exhset(key, field, 1.1, pxat=pxat) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, keepttl=True) == 3.3
+        assert t.exhincrbyfloat(key, field, 2.2, keepttl=True) == approx(3.3)
         assert 0 < t.exhpttl(key, field) <= 10000
 
     def test_exhgetwithver(self):
