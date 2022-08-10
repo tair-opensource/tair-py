@@ -19,13 +19,18 @@ from .tairstring import (
 
 from .tairzset import TairZsetCommands, parse_tair_zset_items
 from .tairbloom import TairBloomCommands
+from .tairroaring import TairRoaringCommands, parse_tr_scan
 
 from redis import Redis
 from redis.asyncio import Redis as AsyncRedis
 
 
 class TairCommands(
-    TairHashCommands, TairStringCommands, TairZsetCommands, TairBloomCommands
+    TairHashCommands,
+    TairStringCommands,
+    TairZsetCommands,
+    TairBloomCommands,
+    TairRoaringCommands,
 ):
     pass
 
@@ -62,6 +67,15 @@ TAIR_RESPONSE_CALLBACKS = {
     "EXZREVRANGEBYSCORE": parse_tair_zset_items,
     # TairBloom
     "BF.RESERVE": bool_ok,
+    # TairRoaring
+    "TR.GETBIT": lambda resp: resp if resp == 1 else 0,
+    "TR.APPENDINTARRAY": bool_ok,
+    "TR.SETINTARRAY": bool_ok,
+    "TR.SETBITARRAY": bool_ok,
+    "TR.OPTIMIZE": bool_ok,
+    "TR.SCAN": parse_tr_scan,
+    "TR.RANGEBITARRAY": lambda resp: resp.decode(),
+    "TR.JACCARD": lambda resp: float(resp.decode()),
 }
 
 
