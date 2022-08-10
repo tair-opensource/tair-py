@@ -4,6 +4,7 @@ from .cluster import TairCluster
 from .tairstring import ExgetResult, ExcasResult
 from .tairhash import ExhscanResult, FieldValueItem, ValueVersionItem
 from .tairzset import TairZsetItem
+from .tairroaring import TrScanResult
 
 from .exceptions import (
     AuthenticationError,
@@ -30,6 +31,7 @@ __all__ = [
     "ExhscanResult",
     "FieldValueItem",
     "ValueVersionItem",
+    "TrScanResult",
     "TairZsetItem",
     "AuthenticationError",
     "AuthenticationWrongNumberOfArgsError",
