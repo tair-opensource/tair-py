@@ -1,4 +1,4 @@
-from typing import Iterable, Optional
+from typing import Iterable, List, Optional
 
 from .typing import (
     CommandsProtocol,
@@ -37,7 +37,7 @@ class TairBloomCommands(CommandsProtocol):
         error_rate: Optional[float] = None,
         nocreate: bool = False,
     ) -> ResponseT:
-        pieces: list[EncodableT] = [key]
+        pieces: List[EncodableT] = [key]
 
         if capacity is not None:
             pieces.append("CAPACITY")
