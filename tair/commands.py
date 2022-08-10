@@ -18,16 +18,14 @@ from .tairstring import (
 )
 
 from .tairzset import TairZsetCommands, parse_tair_zset_items
-
+from .tairbloom import TairBloomCommands
 
 from redis import Redis
 from redis.asyncio import Redis as AsyncRedis
 
 
 class TairCommands(
-    TairHashCommands,
-    TairStringCommands,
-    TairZsetCommands,
+    TairHashCommands, TairStringCommands, TairZsetCommands, TairBloomCommands
 ):
     pass
 
@@ -62,6 +60,8 @@ TAIR_RESPONSE_CALLBACKS = {
     "EXZREVRANGE": parse_tair_zset_items,
     "EXZRANGEBYSCORE": parse_tair_zset_items,
     "EXZREVRANGEBYSCORE": parse_tair_zset_items,
+    # TairBloom
+    "BF.RESERVE": bool_ok,
 }
 
 
