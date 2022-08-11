@@ -1,9 +1,14 @@
+import pytest
+
 from tair import Tair
 from datetime import datetime
 
-DEFAULT_TAIR_HOST = "localhost"
-DEFAULT_TAIR_PORT = 6379
-DEFAULT_TAIR_DB = 0
+# change the following configuration for your Tair.
+TAIR_HOST = "localhost"
+TAIR_PORT = 6379
+TAIR_DB = 0
+TAIR_USERNAME = "root"
+TAIR_PASSWORD = "123456"
 
 # due to network delay, ttl and pttl are not very accurate,
 # so we set a calibration value.
@@ -11,12 +16,17 @@ DEFAULT_TAIR_DB = 0
 NETWORK_DELAY_CALIBRATION_VALUE = 1000
 
 
-def get_tair_client() -> Tair:
-    return Tair(
-        host=DEFAULT_TAIR_HOST,
-        port=DEFAULT_TAIR_PORT,
-        db=DEFAULT_TAIR_DB,
+@pytest.fixture()
+def t() -> Tair:
+    tair = Tair(
+        host=TAIR_HOST,
+        port=TAIR_PORT,
+        db=TAIR_DB,
+        username=TAIR_USERNAME,
+        password=TAIR_PASSWORD,
     )
+    yield tair
+    tair.close()
 
 
 def get_server_time(client) -> datetime:
