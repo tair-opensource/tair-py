@@ -7,8 +7,8 @@ from datetime import datetime
 TAIR_HOST = "localhost"
 TAIR_PORT = 6379
 TAIR_DB = 0
-TAIR_USERNAME = "root"
-TAIR_PASSWORD = "123456"
+TAIR_USERNAME = None
+TAIR_PASSWORD = None
 
 # due to network delay, ttl and pttl are not very accurate,
 # so we set a calibration value.
