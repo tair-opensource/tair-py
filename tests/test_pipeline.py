@@ -2,17 +2,13 @@ import uuid
 
 from tair import ExgetResult
 
-from .conftest import get_tair_client
-
 
 class TestPipeline:
-    def test_pipeline_is_true(self):
-        t = get_tair_client()
+    def test_pipeline_is_true(self, t):
         with t.pipeline() as pipe:
             assert pipe
 
-    def test_pipeline(self):
-        t = get_tair_client()
+    def test_pipeline(self, t):
         with t.pipeline() as pipe:
             key1 = "key_" + str(uuid.uuid4())
             key2 = "key_" + str(uuid.uuid4())
