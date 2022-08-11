@@ -2,6 +2,7 @@ import datetime
 import time
 import uuid
 
+from tair import Tair
 from pytest import approx, raises
 
 from tair import (
@@ -24,7 +25,7 @@ from .conftest import get_server_time, NETWORK_DELAY_CALIBRATION_VALUE
 
 
 class TestTairHash:
-    def test_exhset_success(self, t):
+    def test_exhset_success(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
@@ -38,7 +39,7 @@ class TestTairHash:
         assert t.exhset(key, field, value2) == 0
         assert t.exhget(key, field) == value2.encode()
 
-    def test_exhset_ex(self, t):
+    def test_exhset_ex(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -50,7 +51,7 @@ class TestTairHash:
         with raises(DataError):
             t.exhset(key, field, value, ex=10.0)
 
-    def test_exhset_ex_timedelta(self, t):
+    def test_exhset_ex_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -59,7 +60,7 @@ class TestTairHash:
         assert t.exhset(key, field, value, ex=ex) == 1
         assert 0 < t.exhttl(key, field) <= 10
 
-    def test_exhset_px(self, t):
+    def test_exhset_px(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -71,7 +72,7 @@ class TestTairHash:
         with raises(DataError):
             t.exhset(key, field, value, px=10000.0)
 
-    def test_exhset_px_timedelta(self, t):
+    def test_exhset_px_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -80,7 +81,7 @@ class TestTairHash:
         assert t.exhset(key, field, value, px=px) == 1
         assert 0 < t.exhpttl(key, field) <= 10000
 
-    def test_exhset_exat(self, t):
+    def test_exhset_exat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -90,7 +91,7 @@ class TestTairHash:
         assert t.exhset(key, field, value, exat=exat) == 1
         assert 0 < t.exhttl(key, field) <= 10
 
-    def test_exhset_exat_timedelta(self, t):
+    def test_exhset_exat_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -99,7 +100,7 @@ class TestTairHash:
         assert t.exhset(key, field, value, exat=exat) == 1
         assert 0 < t.exhttl(key, field) <= 10
 
-    def test_exhset_pxat(self, t):
+    def test_exhset_pxat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -109,7 +110,7 @@ class TestTairHash:
         assert t.exhset(key, field, value, pxat=pxat) == 1
         assert 0 < t.exhpttl(key, field) <= 10000
 
-    def test_exhset_pxat_timedelta(self, t):
+    def test_exhset_pxat_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -119,7 +120,7 @@ class TestTairHash:
         # due to network delay, pttl may be greater than 10000.
         assert 0 < t.exhpttl(key, field) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
-    def test_exhset_xx(self, t):
+    def test_exhset_xx(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
@@ -130,7 +131,7 @@ class TestTairHash:
         assert t.exhset(key, field, value1) == 1
         assert t.exhset(key, field, value2, xx=True) == 0
 
-    def test_exhset_nx(self, t):
+    def test_exhset_nx(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
@@ -140,7 +141,7 @@ class TestTairHash:
         # if the field exists and nx is True, return -1.
         assert t.exhset(key, field, value2, nx=True) == -1
 
-    def test_exhset_ver(self, t):
+    def test_exhset_ver(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
@@ -153,7 +154,7 @@ class TestTairHash:
         with raises(ResponseError):
             t.exhset(key, field, value3, ver=100)
 
-    def test_exhset_abs(self, t):
+    def test_exhset_abs(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
@@ -163,7 +164,7 @@ class TestTairHash:
         assert t.exhset(key, field, value2, abs=100) == 0
         assert t.exhver(key, field) == 100
 
-    def test_exhset_keepttl(self, t):
+    def test_exhset_keepttl(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
@@ -175,7 +176,7 @@ class TestTairHash:
         assert t.exhset(key, field, value2, keepttl=True) == 0
         assert 0 < t.exhpttl(key, field) <= 10000
 
-    def test_exhmset(self, t):
+    def test_exhmset(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field1 = "field_" + str(uuid.uuid4())
         field2 = "field_" + str(uuid.uuid4())
@@ -186,7 +187,7 @@ class TestTairHash:
         assert t.exhget(key, field1) == value1.encode()
         assert t.exhget(key, field2) == value2.encode()
 
-    def test_exhpexpireat(self, t):
+    def test_exhpexpireat(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         key2 = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
@@ -202,7 +203,7 @@ class TestTairHash:
         # if the field does not exist, return 0.
         assert t.exhpexpireat(key2, field, pxat) == 0
 
-    def test_exhpexpireat_ver(self, t):
+    def test_exhpexpireat_ver(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
@@ -216,7 +217,7 @@ class TestTairHash:
         with raises(ResponseError):
             t.exhpexpireat(key, field, pxat=pxat, ver=100)
 
-    def test_exhpexpireat_abs(self, t):
+    def test_exhpexpireat_abs(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -228,7 +229,7 @@ class TestTairHash:
         assert 0 < t.exhpttl(key, field) <= 10000
         assert t.exhver(key, field) == 10
 
-    def test_exhpexpire(self, t):
+    def test_exhpexpire(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         key2 = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
@@ -242,7 +243,7 @@ class TestTairHash:
         # if the field does not exist, return 0.
         assert t.exhpexpire(key2, field, 10000) == 0
 
-    def test_exhpexpire_ver(self, t):
+    def test_exhpexpire_ver(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
@@ -254,7 +255,7 @@ class TestTairHash:
         with raises(ResponseError):
             t.exhpexpire(key, field, px=10000, ver=100)
 
-    def test_exhpexpire_abs(self, t):
+    def test_exhpexpire_abs(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -264,7 +265,7 @@ class TestTairHash:
         assert 0 < t.exhpttl(key, field) <= 10000
         assert t.exhver(key, field) == 10
 
-    def test_exhexpireat(self, t):
+    def test_exhexpireat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -275,7 +276,7 @@ class TestTairHash:
         assert t.exhexpireat(key, field, exat) == 1
         assert 0 < t.exhttl(key, field) <= 10
 
-    def test_exhexpireat_ver(self, t):
+    def test_exhexpireat_ver(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -289,7 +290,7 @@ class TestTairHash:
         with raises(ResponseError):
             t.exhexpireat(key, field, exat=exat, ver=100)
 
-    def test_exhexpireat_abs(self, t):
+    def test_exhexpireat_abs(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -301,7 +302,7 @@ class TestTairHash:
         assert 0 < t.exhttl(key, field) <= 10
         assert t.exhver(key, field) == 10
 
-    def test_exhexpire(self, t):
+    def test_exhexpire(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -310,7 +311,7 @@ class TestTairHash:
         assert t.exhexpire(key, field, 10) == 1
         assert 0 < t.exhttl(key, field) <= 10
 
-    def test_exhexpire_ver(self, t):
+    def test_exhexpire_ver(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
@@ -322,7 +323,7 @@ class TestTairHash:
         with raises(ResponseError):
             t.exhexpire(key, field, ex=10, ver=100)
 
-    def test_exhexpire_abs(self, t):
+    def test_exhexpire_abs(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -332,7 +333,7 @@ class TestTairHash:
         assert 0 < t.exhttl(key, field) <= 10
         assert t.exhver(key, field) == 10
 
-    def test_exhver(self, t):
+    def test_exhver(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -340,7 +341,7 @@ class TestTairHash:
         assert t.exhset(key, field, value) == 1
         assert t.exhver(key, field) == 1
 
-    def test_exhsetver(self, t):
+    def test_exhsetver(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -349,7 +350,7 @@ class TestTairHash:
         assert t.exhsetver(key, field, 10) == 1
         assert t.exhget(key, field) == value.encode()
 
-    def test_exhincrby(self, t):
+    def test_exhincrby(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
 
@@ -357,7 +358,7 @@ class TestTairHash:
         assert t.exhincrby(key, field, 20) == 30
         assert t.exhget(key, field) == b"30"
 
-    def test_exhincrby_ex(self, t):
+    def test_exhincrby_ex(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
 
@@ -369,7 +370,7 @@ class TestTairHash:
         with raises(DataError):
             t.exhincrby(key, field, 20, ex=10.0)
 
-    def test_exhincrby_ex_timedelta(self, t):
+    def test_exhincrby_ex_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         ex = datetime.timedelta(seconds=10)
@@ -378,7 +379,7 @@ class TestTairHash:
         assert t.exhincrby(key, field, 20, ex=ex) == 30
         assert 0 < t.exhttl(key, field) <= 10
 
-    def test_exhincrby_px(self, t):
+    def test_exhincrby_px(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
 
@@ -390,7 +391,7 @@ class TestTairHash:
         with raises(DataError):
             t.exhincrby(key, field, 20, px=10000.0)
 
-    def test_exhincrby_px_timedelta(self, t):
+    def test_exhincrby_px_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         px = datetime.timedelta(milliseconds=10000)
@@ -399,7 +400,7 @@ class TestTairHash:
         assert t.exhincrby(key, field, 20, px=px) == 30
         assert 0 < t.exhpttl(key, field) <= 10000
 
-    def test_exhincrby_exat(self, t):
+    def test_exhincrby_exat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -413,7 +414,7 @@ class TestTairHash:
         with raises(DataError):
             t.exhincrby(key, field, 20, ex=10.0)
 
-    def test_exhincrby_exat_timedelta(self, t):
+    def test_exhincrby_exat_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -422,7 +423,7 @@ class TestTairHash:
         assert t.exhincrby(key, field, 20, exat=expire_at) == 30
         assert 0 < t.exhttl(key, field) <= 10
 
-    def test_exhincrby_pxat(self, t):
+    def test_exhincrby_pxat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -432,7 +433,7 @@ class TestTairHash:
         assert t.exhincrby(key, field, 20, pxat=pxat) == 30
         assert 0 < t.exhpttl(key, field) <= 10000
 
-    def test_exhincrby_pxat_timedelta(self, t):
+    def test_exhincrby_pxat_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         pxat = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -442,7 +443,7 @@ class TestTairHash:
         # due to network delay, pttl may be greater than 10000.
         assert 0 < t.exhpttl(key, field) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
-    def test_exhincrby_ver(self, t):
+    def test_exhincrby_ver(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field1 = "field_" + str(uuid.uuid4())
         field2 = "field_" + str(uuid.uuid4())
@@ -456,7 +457,7 @@ class TestTairHash:
         with raises(ResponseError):
             t.exhincrby(key, field2, 20, ver=10)
 
-    def test_exhincrby_abs(self, t):
+    def test_exhincrby_abs(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
 
@@ -465,7 +466,7 @@ class TestTairHash:
         assert t.exhget(key, field) == b"30"
         assert t.exhver(key, field) == 100
 
-    def test_exhincrby_overflow(self, t):
+    def test_exhincrby_overflow(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
 
@@ -475,7 +476,7 @@ class TestTairHash:
         with raises(ResponseError):
             t.exhincrby(key, field, 20, minval=100)
 
-    def test_exhincrby_keepttl(self, t):
+    def test_exhincrby_keepttl(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         exat = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -485,7 +486,7 @@ class TestTairHash:
         assert t.exhincrby(key, field, 20, keepttl=True) == 30
         assert 0 < t.exhpttl(key, field) <= 10000
 
-    def test_exhincrbyfloat(self, t):
+    def test_exhincrbyfloat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
 
@@ -493,7 +494,7 @@ class TestTairHash:
         assert t.exhincrbyfloat(key, field, 2.2) == approx(3.3)
         assert float(t.exhget(key, field)) == approx(3.3)
 
-    def test_exhincrbyfloat_ex(self, t):
+    def test_exhincrbyfloat_ex(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
 
@@ -505,7 +506,7 @@ class TestTairHash:
         with raises(DataError):
             t.exhincrbyfloat(key, field, 2.2, ex=10.0)
 
-    def test_exhincrbyfloat_ex_timedelta(self, t):
+    def test_exhincrbyfloat_ex_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         ex = datetime.timedelta(seconds=10)
@@ -514,7 +515,7 @@ class TestTairHash:
         assert t.exhincrbyfloat(key, field, 2.2, ex=ex) == approx(3.3)
         assert 0 < t.exhttl(key, field) <= 10
 
-    def test_exhincrbyfloat_px(self, t):
+    def test_exhincrbyfloat_px(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
 
@@ -526,7 +527,7 @@ class TestTairHash:
         with raises(DataError):
             t.exhincrbyfloat(key, field, 2.2, px=10000.0)
 
-    def test_exhincrbyfloat_px_timedelta(self, t):
+    def test_exhincrbyfloat_px_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         px = datetime.timedelta(milliseconds=10000)
@@ -535,7 +536,7 @@ class TestTairHash:
         assert t.exhincrbyfloat(key, field, 2.2, px=px) == approx(3.3)
         assert 0 < t.exhpttl(key, field) <= 10000
 
-    def test_exhincrbyfloat_exat(self, t):
+    def test_exhincrbyfloat_exat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -545,7 +546,7 @@ class TestTairHash:
         assert t.exhincrbyfloat(key, field, 2.2, exat=exat) == approx(3.3)
         assert 0 < t.exhttl(key, field) <= 10
 
-    def test_exhincrbyfloat_exat_timedelta(self, t):
+    def test_exhincrbyfloat_exat_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -554,7 +555,7 @@ class TestTairHash:
         assert t.exhincrbyfloat(key, field, 2.2, exat=expire_at) == approx(3.3)
         assert 0 < t.exhttl(key, field) <= 10
 
-    def test_exhincrbyfloat_pxat(self, t):
+    def test_exhincrbyfloat_pxat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -564,7 +565,7 @@ class TestTairHash:
         assert t.exhincrbyfloat(key, field, 2.2, pxat=pxat) == approx(3.3)
         assert 0 < t.exhpttl(key, field) <= 10000
 
-    def test_exhincrbyfloat_pxat_timedelta(self, t):
+    def test_exhincrbyfloat_pxat_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         pxat = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -574,7 +575,7 @@ class TestTairHash:
         # due to network delay, pttl may be greater than 10000.
         assert 0 < t.exhpttl(key, field) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
-    def test_exhincrbyfloat_ver(self, t):
+    def test_exhincrbyfloat_ver(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field1 = "field_" + str(uuid.uuid4())
         field2 = "field_" + str(uuid.uuid4())
@@ -588,7 +589,7 @@ class TestTairHash:
         with raises(ResponseError):
             t.exhincrbyfloat(key, field2, 2.2, ver=10)
 
-    def test_exhincrbyfloat_abs(self, t):
+    def test_exhincrbyfloat_abs(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
 
@@ -597,7 +598,7 @@ class TestTairHash:
         assert float(t.exhget(key, field)) == approx(3.3)
         assert t.exhver(key, field) == 100
 
-    def test_exhincrbyfloat_overflow(self, t):
+    def test_exhincrbyfloat_overflow(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
 
@@ -607,7 +608,7 @@ class TestTairHash:
         with raises(ResponseError):
             t.exhincrbyfloat(key, field, 2.2, minval=100.0)
 
-    def test_exhincrbyfloat_keepttl(self, t):
+    def test_exhincrbyfloat_keepttl(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
         exat = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -617,7 +618,7 @@ class TestTairHash:
         assert t.exhincrbyfloat(key, field, 2.2, keepttl=True) == approx(3.3)
         assert 0 < t.exhpttl(key, field) <= 10000
 
-    def test_exhgetwithver(self, t):
+    def test_exhgetwithver(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         key2 = "key_" + str(uuid.uuid4())
         field1 = "field_" + str(uuid.uuid4())
@@ -630,7 +631,7 @@ class TestTairHash:
         assert t.exhgetwithver(key2, field1) is None
         assert t.exhgetwithver(key1, field2) is None
 
-    def test_exhmget(self, t):
+    def test_exhmget(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field1 = "field_" + str(uuid.uuid4())
         field2 = "field_" + str(uuid.uuid4())
@@ -640,7 +641,7 @@ class TestTairHash:
         assert t.exhmset(key, {field1: value1, field2: value2})
         assert t.exhmget(key, [field1, field2]) == [value1.encode(), value2.encode()]
 
-    def test_exhmgetwithver_success(self, t):
+    def test_exhmgetwithver_success(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field1 = "field_" + str(uuid.uuid4())
         field2 = "field_" + str(uuid.uuid4())
@@ -653,14 +654,14 @@ class TestTairHash:
             ValueVersionItem(value2.encode(), 1),
         ]
 
-    def test_exhmgetwithver_key_not_exists(self, t):
+    def test_exhmgetwithver_key_not_exists(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field1 = "field_" + str(uuid.uuid4())
         field2 = "field_" + str(uuid.uuid4())
 
         assert t.exhmgetwithver(key, [field1, field2]) == [None, None]
 
-    def test_exhmgetwithver_field_not_exist(self, t):
+    def test_exhmgetwithver_field_not_exist(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field1 = "field_" + str(uuid.uuid4())
         field2 = "field_" + str(uuid.uuid4())
@@ -675,7 +676,7 @@ class TestTairHash:
             ValueVersionItem(value3.encode(), 1),
         ]
 
-    def test_exhlen(self, t):
+    def test_exhlen(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         key2 = "key_" + str(uuid.uuid4())
         field1 = "field_" + str(uuid.uuid4())
@@ -688,7 +689,7 @@ class TestTairHash:
         assert t.exhlen(key2) == 0
         assert t.exhlen(key1, noexp=True) == 2
 
-    def test_exhexists(self, t):
+    def test_exhexists(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         key2 = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
@@ -698,7 +699,7 @@ class TestTairHash:
         assert t.exhexists(key1, field) == 1
         assert t.exhexists(key2, field) == 0
 
-    def test_exhstrlen(self, t):
+    def test_exhstrlen(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         key2 = "key_" + str(uuid.uuid4())
         field1 = "field_" + str(uuid.uuid4())
@@ -710,7 +711,7 @@ class TestTairHash:
         assert t.exhstrlen(key2, field1) == 0
         assert t.exhstrlen(key1, field2) == 0
 
-    def test_exhkeys(self, t):
+    def test_exhkeys(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field1 = "field_" + str(uuid.uuid4())
         field2 = "field_" + str(uuid.uuid4())
@@ -720,7 +721,7 @@ class TestTairHash:
         assert t.exhmset(key, {field1: value1, field2: value2})
         assert sorted(t.exhkeys(key)) == sorted([field1.encode(), field2.encode()])
 
-    def test_exhvals(self, t):
+    def test_exhvals(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         field1 = "field_" + str(uuid.uuid4())
         field2 = "field_" + str(uuid.uuid4())
@@ -733,7 +734,7 @@ class TestTairHash:
         key2 = "key_" + str(uuid.uuid4())
         assert t.exhvals(key2) == []
 
-    def test_exhgetall(self, t):
+    def test_exhgetall(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         field1 = "field_" + str(uuid.uuid4())
         field2 = "field_" + str(uuid.uuid4())
@@ -757,7 +758,7 @@ class TestTairHash:
     # the open source version of exhscan is inconsistent with the enterprise version,
     # so this test sample is temporarily commented out.
 
-    # def test_exhscan(self, t):
+    # def test_exhscan(self, t: Tair):
     #     key1 = "key_" + str(uuid.uuid4())
     #     key2 = "key_" + str(uuid.uuid4())
     #     field1 = "field_1_" + str(uuid.uuid4())
@@ -797,7 +798,7 @@ class TestTairHash:
     #     assert t.exhscan(key1, ">=", field2, match="*", count=3) == result
     #     assert t.exhscan(key2, ">=", field2, count=3) is None
 
-    def test_exhdel(self, t):
+    def test_exhdel(self, t: Tair):
         # NOTE: exhdel actually returns the number of keys it deleted,
         # but in the documentation exhdel returns 1 on success.
         # this should be a error in the documentation.

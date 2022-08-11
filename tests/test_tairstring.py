@@ -2,15 +2,16 @@ import datetime
 import time
 import uuid
 
+
 from pytest import approx, raises
 
 from .conftest import get_server_time, NETWORK_DELAY_CALIBRATION_VALUE
 
-from tair import ExgetResult, ExcasResult, DataError, ResponseError
+from tair import ExgetResult, ExcasResult, DataError, ResponseError, Tair
 
 
 class TestTairString:
-    def test_exset_success(self, t):
+    def test_exset_success(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
 
@@ -19,7 +20,7 @@ class TestTairString:
         assert result.value == value.encode()
         assert result.version == 1
 
-    def test_exset_ex(self, t):
+    def test_exset_ex(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
 
@@ -30,7 +31,7 @@ class TestTairString:
         with raises(DataError):
             t.exset(key, value, ex=10.0)
 
-    def test_exset_ex_timedelta(self, t):
+    def test_exset_ex_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
         expire_at = datetime.timedelta(seconds=10)
@@ -38,7 +39,7 @@ class TestTairString:
         assert t.exset(key, value, ex=expire_at)
         assert 0 < t.ttl(key) <= 10
 
-    def test_exset_px(self, t):
+    def test_exset_px(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
 
@@ -49,7 +50,7 @@ class TestTairString:
         with raises(DataError):
             t.exset(key, value, px=10000.0)
 
-    def test_exset_px_timedelta(self, t):
+    def test_exset_px_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
         expire_at = datetime.timedelta(milliseconds=10000)
@@ -57,7 +58,7 @@ class TestTairString:
         assert t.exset(key, value, px=expire_at)
         assert 0 < t.pttl(key) <= 10000
 
-    def test_exset_exat(self, t):
+    def test_exset_exat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -66,7 +67,7 @@ class TestTairString:
         assert t.exset(key, value, exat=exat)
         assert 0 < t.ttl(key) <= 10
 
-    def test_exset_exat_timedelta(self, t):
+    def test_exset_exat_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -74,7 +75,7 @@ class TestTairString:
         assert t.exset(key, value, exat=expire_at)
         assert 0 < t.ttl(key) <= 10
 
-    def test_exset_pxat(self, t):
+    def test_exset_pxat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -84,7 +85,7 @@ class TestTairString:
         # due to network delay, pttl may be greater than 10000.
         assert 0 < t.pttl(key) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
-    def test_exset_pxat_timedelta(self, t):
+    def test_exset_pxat_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
@@ -93,7 +94,7 @@ class TestTairString:
         # due to network delay, pttl may be greater than 10000.
         assert 0 < t.pttl(key) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
-    def test_exset_nx(self, t):
+    def test_exset_nx(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
 
@@ -101,7 +102,7 @@ class TestTairString:
         # if the key exists and nx is True, exset will return None.
         assert t.exset(key, value, nx=True) is None
 
-    def test_exset_xx(self, t):
+    def test_exset_xx(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
         value2 = "value_" + str(uuid.uuid4())
@@ -111,7 +112,7 @@ class TestTairString:
         assert t.exset(key, value1)
         assert t.exset(key, value2, xx=True)
 
-    def test_exset_ver(self, t):
+    def test_exset_ver(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
         value2 = "value_" + str(uuid.uuid4())
@@ -122,7 +123,7 @@ class TestTairString:
         assert result.value == value2.encode()
         assert result.version == 2
 
-    def test_exset_abs(self, t):
+    def test_exset_abs(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
 
@@ -131,7 +132,7 @@ class TestTairString:
         assert result.value == value.encode()
         assert result.version == 10
 
-    def test_exsetver(self, t):
+    def test_exsetver(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         key2 = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
@@ -145,7 +146,7 @@ class TestTairString:
         # if the key does not exists, exsetver will return 0.
         assert t.exsetver(key2, 10) == 0
 
-    def test_exincrby_success(self, t):
+    def test_exincrby_success(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 10)
@@ -154,7 +155,7 @@ class TestTairString:
         assert result.value == b"30"
         assert result.version == 2
 
-    def test_exincrby_ex(self, t):
+    def test_exincrby_ex(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 10)
@@ -165,7 +166,7 @@ class TestTairString:
         with raises(DataError):
             t.exincrby(key, 20, ex=10.0)
 
-    def test_exincrby_ex_timedelta(self, t):
+    def test_exincrby_ex_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         expire_at = datetime.timedelta(seconds=10)
 
@@ -173,7 +174,7 @@ class TestTairString:
         assert t.exincrby(key, 20, ex=expire_at) == 30
         assert 0 < t.ttl(key) <= 10
 
-    def test_exincrby_px(self, t):
+    def test_exincrby_px(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 10)
@@ -184,7 +185,7 @@ class TestTairString:
         with raises(DataError):
             t.exincrby(key, 20, px=10000.0)
 
-    def test_exincrby_px_timedelta(self, t):
+    def test_exincrby_px_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         expire_at = datetime.timedelta(milliseconds=10000)
 
@@ -192,7 +193,7 @@ class TestTairString:
         assert t.exincrby(key, 20, px=expire_at) == 30
         assert 0 < t.pttl(key) <= 10000
 
-    def test_exincrby_exat(self, t):
+    def test_exincrby_exat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
         exat = int(time.mktime(expire_at.timetuple()))
@@ -201,7 +202,7 @@ class TestTairString:
         assert t.exincrby(key, 20, exat=exat) == 30
         assert 0 < t.ttl(key) <= 10
 
-    def test_exincrby_exat_timedelta(self, t):
+    def test_exincrby_exat_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
 
@@ -209,7 +210,7 @@ class TestTairString:
         assert t.exincrby(key, 20, exat=expire_at) == 30
         assert 0 < t.ttl(key) <= 10
 
-    def test_exincrby_pxat(self, t):
+    def test_exincrby_pxat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
         pxat = int(time.mktime(expire_at.timetuple())) * 1000
@@ -219,7 +220,7 @@ class TestTairString:
         # due to network delay, pttl may be greater than 10000.
         assert 0 < t.pttl(key) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
-    def test_exincrby_pxat_timedelta(self, t):
+    def test_exincrby_pxat_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
 
@@ -228,7 +229,7 @@ class TestTairString:
         # due to network delay, pttl may be greater than 10000.
         assert 0 < t.pttl(key) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
-    def test_exincrby_nx(self, t):
+    def test_exincrby_nx(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         key2 = "key_" + str(uuid.uuid4())
 
@@ -243,7 +244,7 @@ class TestTairString:
         assert result.value == b"10"
         assert result.version == 1
 
-    def test_exincrby_xx(self, t):
+    def test_exincrby_xx(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         key2 = "key_" + str(uuid.uuid4())
 
@@ -256,7 +257,7 @@ class TestTairString:
         assert result.value == b"30"
         assert result.version == 2
 
-    def test_exincrby_ver(self, t):
+    def test_exincrby_ver(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 10)
@@ -269,7 +270,7 @@ class TestTairString:
         with raises(ResponseError):
             t.exincrby(key, 20, ver=10)
 
-    def test_exincrby_abs(self, t):
+    def test_exincrby_abs(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 10)
@@ -278,7 +279,7 @@ class TestTairString:
         assert result.value == b"30"
         assert result.version == 100
 
-    def test_exincrby_overflow(self, t):
+    def test_exincrby_overflow(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 10)
@@ -287,7 +288,7 @@ class TestTairString:
         with raises(ResponseError):
             t.exincrby(key, 20, minval=100)
 
-    def test_exincrbyfloat(self, t):
+    def test_exincrbyfloat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 1.1)
@@ -296,7 +297,7 @@ class TestTairString:
         assert float(result.value) == approx(3.3)
         assert result.version == 2
 
-    def test_exincrbyfloat_ex(self, t):
+    def test_exincrbyfloat_ex(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 1.1)
@@ -307,7 +308,7 @@ class TestTairString:
         with raises(DataError):
             t.exincrbyfloat(key, 20, ex=10.0)
 
-    def test_exincrbyfloat_ex_timedelta(self, t):
+    def test_exincrbyfloat_ex_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         expire_at = datetime.timedelta(seconds=10)
 
@@ -315,7 +316,7 @@ class TestTairString:
         assert t.exincrbyfloat(key, 2.2, ex=expire_at) == approx(3.3)
         assert 0 < t.ttl(key) <= 10
 
-    def test_exincrbyfloat_px(self, t):
+    def test_exincrbyfloat_px(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 1.1)
@@ -326,7 +327,7 @@ class TestTairString:
         with raises(DataError):
             t.exincrbyfloat(key, 20, px=10000.0)
 
-    def test_exincrbyfloat_px_timedelta(self, t):
+    def test_exincrbyfloat_px_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         expire_at = datetime.timedelta(milliseconds=10000)
 
@@ -334,7 +335,7 @@ class TestTairString:
         assert t.exincrbyfloat(key, 2.2, px=expire_at) == approx(3.3)
         assert 0 < t.pttl(key) <= 10000
 
-    def test_exincrbyfloat_exat(self, t):
+    def test_exincrbyfloat_exat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
         exat = int(time.mktime(expire_at.timetuple()))
@@ -343,7 +344,7 @@ class TestTairString:
         assert t.exincrbyfloat(key, 2.2, exat=exat) == approx(3.3)
         assert 0 < t.ttl(key) <= 10
 
-    def test_exincrbyfloat_exat_timedelta(self, t):
+    def test_exincrbyfloat_exat_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
 
@@ -351,7 +352,7 @@ class TestTairString:
         assert t.exincrbyfloat(key, 2.2, exat=expire_at) == approx(3.3)
         assert 0 < t.ttl(key) <= 10
 
-    def test_exincrbyfloat_pxat(self, t):
+    def test_exincrbyfloat_pxat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
         pxat = int(time.mktime(expire_at.timetuple())) * 1000
@@ -361,7 +362,7 @@ class TestTairString:
         # due to network delay, pttl may be greater than 10000.
         assert 0 < t.pttl(key) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
-    def test_exincrbyfloat_pxat_timedelta(self, t):
+    def test_exincrbyfloat_pxat_timedelta(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
 
@@ -370,7 +371,7 @@ class TestTairString:
         # due to network delay, pttl may be greater than 10000.
         assert 0 < t.pttl(key) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
-    def test_exincrbyfloat_nx(self, t):
+    def test_exincrbyfloat_nx(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         key2 = "key_" + str(uuid.uuid4())
 
@@ -385,7 +386,7 @@ class TestTairString:
         assert float(result.value) == approx(1.1)
         assert result.version == 1
 
-    def test_exincrbyfloat_xx(self, t):
+    def test_exincrbyfloat_xx(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         key2 = "key_" + str(uuid.uuid4())
 
@@ -398,7 +399,7 @@ class TestTairString:
         assert float(result.value) == approx(3.3)
         assert result.version == 2
 
-    def test_exincrbyfloat_ver(self, t):
+    def test_exincrbyfloat_ver(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 1.1)
@@ -411,7 +412,7 @@ class TestTairString:
         with raises(ResponseError):
             t.exincrbyfloat(key, 2.2, ver=10)
 
-    def test_exincrbyfloat_abs(self, t):
+    def test_exincrbyfloat_abs(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 1.1)
@@ -420,7 +421,7 @@ class TestTairString:
         assert float(result.value) == approx(3.3)
         assert result.version == 100
 
-    def test_exincrbyfloat_overflow(self, t):
+    def test_exincrbyfloat_overflow(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 9.1)
@@ -429,7 +430,7 @@ class TestTairString:
         with raises(ResponseError):
             t.exincrbyfloat(key, 0.1, minval=100)
 
-    def test_excas_success(self, t):
+    def test_excas_success(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
         value2 = "value_" + str(uuid.uuid4())
@@ -443,7 +444,7 @@ class TestTairString:
         assert exget_result.value == value2.encode()
         assert exget_result.version == 2
 
-    def test_excas_failed(self, t):
+    def test_excas_failed(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
         value2 = "value_" + str(uuid.uuid4())
@@ -454,14 +455,14 @@ class TestTairString:
         assert result.value == value1.encode()
         assert result.version == 1
 
-    def test_excas_not_exists(self, t):
+    def test_excas_not_exists(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
 
         # if the key does not exist, return -1.
         assert t.excas(key, value, 1) == -1
 
-    def test_excad(self, t):
+    def test_excad(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
 
@@ -469,34 +470,34 @@ class TestTairString:
         assert t.excad(key, 1) == 1
         assert not t.exists(key)
 
-    def test_excad_not_exists(self, t):
+    def test_excad_not_exists(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         # if the key does not exist, return -1.
         assert t.excad(key, 1) == -1
 
-    def test_cas_success(self, t):
+    def test_cas_success(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
 
         assert t.set(key, value) is True
         assert t.cas(key, value, "newval") == 1
 
-    def test_cas_fail(self, t):
+    def test_cas_fail(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
 
         assert t.set(key, value) is True
         assert t.cas(key, "oldkey", "newval") == 0
 
-    def test_cad_success(self, t):
+    def test_cad_success(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
 
         assert t.setnx(key, value) is True
         assert t.cad(key, value) == 1
 
-    def test_cad_fail(self, t):
+    def test_cad_fail(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
 
