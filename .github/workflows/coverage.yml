@@ -75,6 +75,9 @@ jobs:
 
       - name: install pytest
         run: pip install pytest
+      
+      - name: install pytest-asyncio
+        run: pip install pytest-asyncio
 
       - name: install coverage
         run: pip install coverage

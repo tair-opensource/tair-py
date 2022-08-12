@@ -76,5 +76,8 @@ jobs:
       - name: install pytest
         run: pip install pytest
 
+      - name: install pytest-asyncio
+        run: pip install pytest-asyncio
+
       - name: test
         run: pytest -vv tests/test_tairstring.py tests/test_tairhash.py tests/test_tairzset.py tests/test_asyncio/test_tairstring.py tests/test_asyncio/test_tairhash.py tests/test_asyncio/test_tairzset.py
