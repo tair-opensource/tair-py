@@ -5,6 +5,7 @@ from .tairstring import ExgetResult, ExcasResult
 from .tairhash import ExhscanResult, FieldValueItem, ValueVersionItem
 from .tairzset import TairZsetItem
 from .tairroaring import TrScanResult
+from .tairsearch import ScandocidResult
 
 from .exceptions import (
     AuthenticationError,
@@ -32,6 +33,7 @@ __all__ = [
     "FieldValueItem",
     "ValueVersionItem",
     "TrScanResult",
+    "ScandocidResult",
     "TairZsetItem",
     "AuthenticationError",
     "AuthenticationWrongNumberOfArgsError",
