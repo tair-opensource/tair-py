@@ -5,12 +5,19 @@ from typing import List
 from threading import Thread
 from tair import Tair, ResponseError
 
+# change the following configuration for your Tair.
+TAIR_HOST = "localhost"
+TAIR_PORT = 6379
+TAIR_DB = 0
+TAIR_USERNAME = None
+TAIR_PASSWORD = None
+
 tair: Tair = Tair(
-    host="localhost",
-    port=6379,
-    db=0,
-    username="root",
-    password="123456",
+    host=TAIR_HOST,
+    port=TAIR_PORT,
+    db=TAIR_DB,
+    username=TAIR_USERNAME,
+    password=TAIR_PASSWORD,
 )
 
 

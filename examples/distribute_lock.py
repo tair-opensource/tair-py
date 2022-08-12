@@ -6,6 +6,20 @@ from threading import Thread
 from typing import List
 from tair import Tair, TairError
 
+# change the following configuration for your Tair.
+TAIR_HOST = "localhost"
+TAIR_PORT = 6379
+TAIR_DB = 0
+TAIR_USERNAME = None
+TAIR_PASSWORD = None
+
+tair: Tair = Tair(
+    host=TAIR_HOST,
+    port=TAIR_PORT,
+    db=TAIR_DB,
+    username=TAIR_USERNAME,
+    password=TAIR_PASSWORD,
+)
 
 LOCK_KEY: str = "LOCK_KEY"
 
@@ -13,15 +27,6 @@ LOCK_KEY: str = "LOCK_KEY"
 class Account:
     def __init__(self, balance: int) -> None:
         self.balance = balance
-
-
-tair: Tair = Tair(
-    host="localhost",
-    port=6379,
-    db=0,
-    username="root",
-    password="123456",
-)
 
 
 # try_lock locks atomically via set with NX flag
