@@ -20,6 +20,7 @@ from .tairstring import (
 from .tairzset import TairZsetCommands, parse_tair_zset_items
 from .tairbloom import TairBloomCommands
 from .tairroaring import TairRoaringCommands, parse_tr_scan
+from .tairsearch import TairSearchCommands, ScandocidResult
 
 from redis import Redis
 from redis.asyncio import Redis as AsyncRedis
@@ -31,6 +32,7 @@ class TairCommands(
     TairZsetCommands,
     TairBloomCommands,
     TairRoaringCommands,
+    TairSearchCommands,
 ):
     pass
 
@@ -76,6 +78,23 @@ TAIR_RESPONSE_CALLBACKS = {
     "TR.SCAN": parse_tr_scan,
     "TR.RANGEBITARRAY": lambda resp: resp.decode(),
     "TR.JACCARD": lambda resp: float(resp.decode()),
+    # TairSearch
+    "TFT.CREATEINDEX": bool_ok,
+    "TFT.UPDATEINDEX": bool_ok,
+    "TFT.GETINDEX": lambda resp: None if resp is None else resp.decode(),
+    "TFT.ADDDOC": lambda resp: resp.decode(),
+    "TFT.MADDDOC": bool_ok,
+    "TFT.DELDOC": lambda resp: int(resp.decode()),
+    "TFT.UPDATEDOCFIELD": bool_ok,
+    "TFT.INCRFLOATDOCFIELD": lambda resp: float(resp.decode()),
+    "TFT.GETDOC": lambda resp: None if resp is None else resp.decode(),
+    "TFT.SCANDOCID": lambda resp: ScandocidResult(
+        resp[0].decode(), [i.decode() for i in resp[1]]
+    ),
+    "TFT.DELALL": bool_ok,
+    "TFT.SEARCH": lambda resp: resp.decode(),
+    "TFT.GETSUG": lambda resp: [i.decode() for i in resp],
+    "TFT.GETALLSUGS": lambda resp: [i.decode() for i in resp],
 }
 
 
