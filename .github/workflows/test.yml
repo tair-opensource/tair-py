@@ -77,4 +77,4 @@ jobs:
         run: pip install pytest
 
       - name: test
-        run: pytest tests/test_tairstring.py tests/test_tairhash.py tests/test_tairzset.py --verbosity=1
+        run: pytest -vv tests/test_tairstring.py tests/test_tairhash.py tests/test_tairzset.py tests/test_asyncio/test_tairstring.py tests/test_asyncio/test_tairhash.py tests/test_asyncio/test_tairzset.py
