@@ -1,15 +1,10 @@
-import pytest
-
 import uuid
-
-from .conftest import get_tair_client
-
-from tair import DataError, TairZsetItem
+from pytest import raises
+from tair import DataError, TairZsetItem, Tair
 
 
 class TestTairZset:
-    def test_exzadd_success(self):
-        t = get_tair_client()
+    def test_exzadd_success(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -22,8 +17,7 @@ class TestTairZset:
             TairZsetItem(member2.encode(), str(score2)),
         ]
 
-    def test_exzadd_add_and_update(self):
-        t = get_tair_client()
+    def test_exzadd_add_and_update(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -41,8 +35,7 @@ class TestTairZset:
             TairZsetItem(member3.encode(), str(score3)),
         ]
 
-    def test_exzadd_ch(self):
-        t = get_tair_client()
+    def test_exzadd_ch(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -65,8 +58,7 @@ class TestTairZset:
             TairZsetItem(member3.encode(), str(score3)),
         ]
 
-    def test_exzadd_nx(self):
-        t = get_tair_client()
+    def test_exzadd_nx(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -89,8 +81,7 @@ class TestTairZset:
             TairZsetItem(member3.encode(), str(score3)),
         ]
 
-    def test_exzadd_xx(self):
-        t = get_tair_client()
+    def test_exzadd_xx(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -112,8 +103,7 @@ class TestTairZset:
             TairZsetItem(member2.encode(), str(score2_2)),
         ]
 
-    def test_exzadd_incr(self):
-        t = get_tair_client()
+    def test_exzadd_incr(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member = "member_" + str(uuid.uuid4())
 
@@ -123,16 +113,14 @@ class TestTairZset:
             TairZsetItem(member.encode(), "30"),
         ]
 
-    def test_exzincrby(self):
-        t = get_tair_client()
+    def test_exzincrby(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member = "member_" + str(uuid.uuid4())
 
         assert t.exzadd(key, {member: 10})
         assert t.exzincrby(key, 20, member) == "30"
 
-    def test_exzscore(self):
-        t = get_tair_client()
+    def test_exzscore(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
         key2 = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
@@ -143,8 +131,7 @@ class TestTairZset:
         assert t.exzscore(key1, member2) is None
         assert t.exzscore(key1, member1) == "10"
 
-    def test_exzrange(self):
-        t = get_tair_client()
+    def test_exzrange(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -184,8 +171,7 @@ class TestTairZset:
             TairZsetItem(member4.encode(), str(score4)),
         ]
 
-    def test_exzrevrange(self):
-        t = get_tair_client()
+    def test_exzrevrange(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -225,8 +211,7 @@ class TestTairZset:
             TairZsetItem(member2.encode(), str(score2)),
         ]
 
-    def test_exzrangebyscore(self):
-        t = get_tair_client()
+    def test_exzrangebyscore(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -265,8 +250,7 @@ class TestTairZset:
             TairZsetItem(member4.encode(), str(score4)),
         ]
 
-    def test_exzrangebyscore_limit(self):
-        t = get_tair_client()
+    def test_exzrangebyscore_limit(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -297,14 +281,13 @@ class TestTairZset:
             TairZsetItem(member3.encode(), str(score3)),
         ]
 
-        with pytest.raises(DataError):
+        with raises(DataError):
             t.exzrangebyscore(key, 20, 40, True, offset=1)
 
-        with pytest.raises(DataError):
+        with raises(DataError):
             t.exzrangebyscore(key, 20, 40, True, count=1)
 
-    def test_exzrevrangebyscore(self):
-        t = get_tair_client()
+    def test_exzrevrangebyscore(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -343,8 +326,7 @@ class TestTairZset:
             TairZsetItem(member2.encode(), str(score2)),
         ]
 
-    def test_exzrevrangebyscore_limit(self):
-        t = get_tair_client()
+    def test_exzrevrangebyscore_limit(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -375,14 +357,13 @@ class TestTairZset:
             TairZsetItem(member3.encode(), str(score3)),
         ]
 
-        with pytest.raises(DataError):
+        with raises(DataError):
             t.exzrevrangebyscore(key, 40, 20, True, offset=1)
 
-        with pytest.raises(DataError):
+        with raises(DataError):
             t.exzrevrangebyscore(key, 40, 20, True, count=1)
 
-    def test_exzrangebylex(self):
-        t = get_tair_client()
+    def test_exzrangebylex(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_a"
         member2 = "member_b"
@@ -415,8 +396,7 @@ class TestTairZset:
             member4.encode(),
         ]
 
-    def test_exzrangebylex_limit(self):
-        t = get_tair_client()
+    def test_exzrangebylex_limit(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_a"
         member2 = "member_b"
@@ -447,14 +427,13 @@ class TestTairZset:
             key, f"[{member2}", f"[{member4}", offset=1, count=1
         ) == [member3.encode()]
 
-        with pytest.raises(DataError):
+        with raises(DataError):
             t.exzrangebylex(key, f"[{member2}", f"[{member4}", offset=1)
 
-        with pytest.raises(DataError):
+        with raises(DataError):
             t.exzrangebylex(key, f"[{member2}", f"[{member4}", count=1)
 
-    def test_exzrevrangebylex(self):
-        t = get_tair_client()
+    def test_exzrevrangebylex(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_a"
         member2 = "member_b"
@@ -487,8 +466,7 @@ class TestTairZset:
             member2.encode(),
         ]
 
-    def test_exzrevrangebylex_limit(self):
-        t = get_tair_client()
+    def test_exzrevrangebylex_limit(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_a"
         member2 = "member_b"
@@ -519,14 +497,13 @@ class TestTairZset:
             key, f"[{member4}", f"[{member2}", offset=1, count=1
         ) == [member3.encode()]
 
-        with pytest.raises(DataError):
+        with raises(DataError):
             t.exzrevrangebylex(key, f"[{member4}", f"[{member2}", offset=1)
 
-        with pytest.raises(DataError):
+        with raises(DataError):
             t.exzrevrangebylex(key, f"[{member4}", f"[{member2}", count=1)
 
-    def test_exzrem(self):
-        t = get_tair_client()
+    def test_exzrem(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -546,8 +523,7 @@ class TestTairZset:
         assert t.exzrem(key, [member1, member2, member3]) == 3
         assert t.exzcard(key) == 0
 
-    def test_exzremrangebyscore(self):
-        t = get_tair_client()
+    def test_exzremrangebyscore(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -575,8 +551,7 @@ class TestTairZset:
         )
         assert t.exzremrangebyscore(key, 10, 30) == 3
 
-    def test_exzremrangebyrank(self):
-        t = get_tair_client()
+    def test_exzremrangebyrank(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -604,8 +579,7 @@ class TestTairZset:
         )
         assert t.exzremrangebyrank(key, 1, 3) == 3
 
-    def test_exzremrangebylex(self):
-        t = get_tair_client()
+    def test_exzremrangebylex(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_a"
         member2 = "member_b"
@@ -633,8 +607,7 @@ class TestTairZset:
         )
         assert t.exzremrangebylex(key, f"[{member2}", f"[{member4}") == 3
 
-    def test_exzrank(self):
-        t = get_tair_client()
+    def test_exzrank(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -658,8 +631,7 @@ class TestTairZset:
         assert t.exzrank(key, member2) == 1
         assert t.exzrank(key, member3) == 2
 
-    def test_exzrevrank(self):
-        t = get_tair_client()
+    def test_exzrevrank(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -683,8 +655,7 @@ class TestTairZset:
         assert t.exzrevrank(key, member2) == 1
         assert t.exzrevrank(key, member3) == 0
 
-    def test_exzcount(self):
-        t = get_tair_client()
+    def test_exzcount(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -712,8 +683,7 @@ class TestTairZset:
         )
         assert t.exzcount(key, 20, 40) == 3
 
-    def test_exzlexcount(self):
-        t = get_tair_client()
+    def test_exzlexcount(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_a"
         member2 = "member_b"
@@ -741,8 +711,7 @@ class TestTairZset:
         )
         assert t.exzlexcount(key, f"[{member2}", f"[{member4}") == 3
 
-    def test_exzrankbyscore(self):
-        t = get_tair_client()
+    def test_exzrankbyscore(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
@@ -775,8 +744,7 @@ class TestTairZset:
         assert t.exzrankbyscore(key, score4) == 3
         assert t.exzrankbyscore(key, score5) == 4
 
-    def test_exzrevrankbyscore(self):
-        t = get_tair_client()
+    def test_exzrevrankbyscore(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         member1 = "member_" + str(uuid.uuid4())
         member2 = "member_" + str(uuid.uuid4())
