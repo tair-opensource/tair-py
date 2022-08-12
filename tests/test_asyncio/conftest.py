@@ -1,14 +1,8 @@
-import pytest
-
-from tair import Tair
+import pytest_asyncio
 from datetime import datetime
+from tair.asyncio import Tair
+from ..conftest import TAIR_HOST, TAIR_PORT, TAIR_DB, TAIR_USERNAME, TAIR_PASSWORD
 
-# change the following configuration for your Tair.
-TAIR_HOST = "localhost"
-TAIR_PORT = 6379
-TAIR_DB = 0
-TAIR_USERNAME = None
-TAIR_PASSWORD = None
 
 # due to network delay, ttl and pttl are not very accurate,
 # so we set a calibration value.
@@ -16,8 +10,7 @@ TAIR_PASSWORD = None
 NETWORK_DELAY_CALIBRATION_VALUE = 1000
 
 
-@pytest.fixture()
-def t() -> Tair:
+async def get_tair_client() -> Tair:
     tair = Tair(
         host=TAIR_HOST,
         port=TAIR_PORT,
@@ -25,11 +18,18 @@ def t() -> Tair:
         username=TAIR_USERNAME,
         password=TAIR_PASSWORD,
     )
+    await tair.initialize()
+    return tair
+
+
+@pytest_asyncio.fixture()
+async def t():
+    tair = await get_tair_client()
     yield tair
-    tair.close()
+    await tair.close()
 
 
-def get_server_time(client) -> datetime:
-    seconds, milliseconds = client.time()
+async def get_server_time(client) -> datetime:
+    seconds, milliseconds = await client.time()
     timestamp = float(f"{seconds}.{milliseconds}")
     return datetime.fromtimestamp(timestamp)
