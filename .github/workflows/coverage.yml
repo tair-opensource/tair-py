@@ -75,11 +75,14 @@ jobs:
 
       - name: install pytest
         run: pip install pytest
+      
+      - name: install pytest-asyncio
+        run: pip install pytest-asyncio
 
       - name: install coverage
         run: pip install coverage
 
       - name: coverage
         run: |
-          python -m coverage run --include=tair/tairstring.py,tair/tairhash.py,tair/tairzset.py -m pytest tests/test_tairstring.py tests/test_tairhash.py tests/test_tairzset.py --verbosity=1
-          python -m coverage report
+          python -m coverage run --include=tair/tairstring.py,tair/tairhash.py,tair/tairzset.py -m pytest -vv tests/test_tairstring.py tests/test_tairhash.py tests/test_tairzset.py tests/test_asyncio/test_tairstring.py tests/test_asyncio/test_tairhash.py tests/test_asyncio/test_tairzset.py
+          python -m coverage report -m
