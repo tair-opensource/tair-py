@@ -10,9 +10,12 @@
 
 基于 [redis-py](https://github.com/redis/redis-py) 封装的，[云数据库 Redis 企业版（Tair）](https://help.aliyun.com/document_detail/145956.html)的 Python 客户端。支持 Tair 的以下模块：
 
-- [TairString](https://help.aliyun.com/document_detail/145902.html)
-- [TairHash](https://help.aliyun.com/document_detail/145970.html)
-- [TairZset](https://help.aliyun.com/document_detail/292812.html)
+- [TairString](https://help.aliyun.com/document_detail/145902.html), 支持 string 设置 version，增强的 `cas` 和 `cad` 命令可轻松实现分布式锁。([已开源](https://github.com/alibaba/TairString))
+- [TairHash](https://help.aliyun.com/document_detail/145970.html), 可实现 field 级别的过期。([已开源](https://github.com/alibaba/TairHash))
+- [TairZset](https://help.aliyun.com/document_detail/292812.html), 支持多维排序。([已开源](https://github.com/alibaba/TairZset))
+- [TairBloom](https://help.aliyun.com/document_detail/145972.html), 支持动态扩容的布隆过滤器。（待开源）
+- [TairRoaring](https://help.aliyun.com/document_detail/311433.html), Roaring Bitmap, 使用少量的存储空间来实现海量数据的查询优化。（待开源）
+- [TairSearch](https://help.aliyun.com/document_detail/417908.html), 支持ES-LIKE语法的全文索引和搜索模块。（待开源） 
 
 ## 安装
 
@@ -34,14 +37,25 @@ python setup.py install
 
 tair-py 支持 Python 3.7 及以上版本。
 
-```pycon
->>> import tair
->>> t = tair.Tair(host='localhost', port=6379, db=0)
->>> t.exset('foo', 'bar')
-b'OK'
->>> t.exget('foo')
-[b'bar', 1]
+```python
+#!/usr/bin/env python
+
+from tair import Tair
+
+if __name__ == "__main__":
+    try:
+        t = Tair(host="localhost", port=6379, db=0)
+        t.exset("foo", "bar")
+        # exget return a ExgetResult object.
+        ret = t.exget("foo")
+        print(ret.value)  # output b'bar'.
+        print(ret.version)  # output 1
+    except Exception as e:
+        print(e)
+        exit(1)
 ```
+
+更多例子请查看 [examples](https://github.com/alibaba/tair-py/blob/main/examples).
 
 ## 维护者
 
