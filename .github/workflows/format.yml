@@ -19,5 +19,10 @@ jobs:
       - name: install black
         run: pip install black
 
+      - name: install isort
+        run: pip install isort
+
       - name: check format
-        run: python -m black --check -v tair/*.py tests/*.py
+        run: |
+          python -m isort -c --profile black **/*.py
+          python -m black --check -v tair/*.py tests/*.py
