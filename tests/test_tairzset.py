@@ -1,6 +1,8 @@
 import uuid
-from pytest import raises
-from tair import DataError, TairZsetItem, Tair
+
+import pytest
+
+from tair import DataError, Tair, TairZsetItem
 
 
 class TestTairZset:
@@ -281,10 +283,10 @@ class TestTairZset:
             TairZsetItem(member3.encode(), str(score3)),
         ]
 
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exzrangebyscore(key, 20, 40, True, offset=1)
 
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exzrangebyscore(key, 20, 40, True, count=1)
 
     def test_exzrevrangebyscore(self, t: Tair):
@@ -357,10 +359,10 @@ class TestTairZset:
             TairZsetItem(member3.encode(), str(score3)),
         ]
 
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exzrevrangebyscore(key, 40, 20, True, offset=1)
 
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exzrevrangebyscore(key, 40, 20, True, count=1)
 
     def test_exzrangebylex(self, t: Tair):
@@ -427,10 +429,10 @@ class TestTairZset:
             key, f"[{member2}", f"[{member4}", offset=1, count=1
         ) == [member3.encode()]
 
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exzrangebylex(key, f"[{member2}", f"[{member4}", offset=1)
 
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exzrangebylex(key, f"[{member2}", f"[{member4}", count=1)
 
     def test_exzrevrangebylex(self, t: Tair):
@@ -497,10 +499,10 @@ class TestTairZset:
             key, f"[{member4}", f"[{member2}", offset=1, count=1
         ) == [member3.encode()]
 
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exzrevrangebylex(key, f"[{member4}", f"[{member2}", offset=1)
 
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exzrevrangebylex(key, f"[{member4}", f"[{member2}", count=1)
 
     def test_exzrem(self, t: Tair):

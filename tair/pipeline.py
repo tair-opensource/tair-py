@@ -1,7 +1,7 @@
-from .commands import TairCommands
-
 import redis.client
 import redis.cluster
+
+from tair.commands import TairCommands
 
 
 class Pipeline(redis.client.Pipeline, TairCommands):

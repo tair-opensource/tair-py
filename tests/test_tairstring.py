@@ -2,12 +2,11 @@ import datetime
 import time
 import uuid
 
+import pytest
 
-from pytest import approx, raises
+from tair import DataError, ExcasResult, ExgetResult, ResponseError, Tair
 
-from .conftest import get_server_time, NETWORK_DELAY_CALIBRATION_VALUE
-
-from tair import ExgetResult, ExcasResult, DataError, ResponseError, Tair
+from .conftest import NETWORK_DELAY_CALIBRATION_VALUE, get_server_time
 
 
 class TestTairString:
@@ -28,7 +27,7 @@ class TestTairString:
         assert 0 < t.ttl(key) <= 10
 
         # ex should not be a float.
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exset(key, value, ex=10.0)
 
     def test_exset_ex_timedelta(self, t: Tair):
@@ -47,7 +46,7 @@ class TestTairString:
         assert 0 < t.pttl(key) <= 10000
 
         # px should not be a float.
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exset(key, value, px=10000.0)
 
     def test_exset_px_timedelta(self, t: Tair):
@@ -163,7 +162,7 @@ class TestTairString:
         assert 0 < t.ttl(key) <= 10
 
         # ex should not be a float.
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exincrby(key, 20, ex=10.0)
 
     def test_exincrby_ex_timedelta(self, t: Tair):
@@ -182,7 +181,7 @@ class TestTairString:
         assert 0 < t.pttl(key) <= 10000
 
         # px should not be a float.
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exincrby(key, 20, px=10000.0)
 
     def test_exincrby_px_timedelta(self, t: Tair):
@@ -267,7 +266,7 @@ class TestTairString:
         assert result.version == 2
 
         assert t.exset(key, 10)
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exincrby(key, 20, ver=10)
 
     def test_exincrby_abs(self, t: Tair):
@@ -283,29 +282,29 @@ class TestTairString:
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 10)
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exincrby(key, 20, maxval=10)
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exincrby(key, 20, minval=100)
 
     def test_exincrbyfloat(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 1.1)
-        assert t.exincrbyfloat(key, 2.2) == approx(3.3)
+        assert t.exincrbyfloat(key, 2.2) == pytest.approx(3.3)
         result = t.exget(key)
-        assert float(result.value) == approx(3.3)
+        assert float(result.value) == pytest.approx(3.3)
         assert result.version == 2
 
     def test_exincrbyfloat_ex(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 1.1)
-        assert t.exincrbyfloat(key, 2.2, ex=10) == approx(3.3)
+        assert t.exincrbyfloat(key, 2.2, ex=10) == pytest.approx(3.3)
         assert 0 < t.ttl(key) <= 10
 
         # ex should not be a float.
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exincrbyfloat(key, 20, ex=10.0)
 
     def test_exincrbyfloat_ex_timedelta(self, t: Tair):
@@ -313,18 +312,18 @@ class TestTairString:
         expire_at = datetime.timedelta(seconds=10)
 
         assert t.exset(key, 1.1)
-        assert t.exincrbyfloat(key, 2.2, ex=expire_at) == approx(3.3)
+        assert t.exincrbyfloat(key, 2.2, ex=expire_at) == pytest.approx(3.3)
         assert 0 < t.ttl(key) <= 10
 
     def test_exincrbyfloat_px(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 1.1)
-        assert t.exincrbyfloat(key, 2.2, px=10000) == approx(3.3)
+        assert t.exincrbyfloat(key, 2.2, px=10000) == pytest.approx(3.3)
         assert 0 < t.pttl(key) <= 10000
 
         # px should not be a float.
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exincrbyfloat(key, 20, px=10000.0)
 
     def test_exincrbyfloat_px_timedelta(self, t: Tair):
@@ -332,7 +331,7 @@ class TestTairString:
         expire_at = datetime.timedelta(milliseconds=10000)
 
         assert t.exset(key, 1.1)
-        assert t.exincrbyfloat(key, 2.2, px=expire_at) == approx(3.3)
+        assert t.exincrbyfloat(key, 2.2, px=expire_at) == pytest.approx(3.3)
         assert 0 < t.pttl(key) <= 10000
 
     def test_exincrbyfloat_exat(self, t: Tair):
@@ -341,7 +340,7 @@ class TestTairString:
         exat = int(time.mktime(expire_at.timetuple()))
 
         assert t.exset(key, 1.1)
-        assert t.exincrbyfloat(key, 2.2, exat=exat) == approx(3.3)
+        assert t.exincrbyfloat(key, 2.2, exat=exat) == pytest.approx(3.3)
         assert 0 < t.ttl(key) <= 10
 
     def test_exincrbyfloat_exat_timedelta(self, t: Tair):
@@ -349,7 +348,7 @@ class TestTairString:
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
 
         assert t.exset(key, 1.1)
-        assert t.exincrbyfloat(key, 2.2, exat=expire_at) == approx(3.3)
+        assert t.exincrbyfloat(key, 2.2, exat=expire_at) == pytest.approx(3.3)
         assert 0 < t.ttl(key) <= 10
 
     def test_exincrbyfloat_pxat(self, t: Tair):
@@ -358,7 +357,7 @@ class TestTairString:
         pxat = int(time.mktime(expire_at.timetuple())) * 1000
 
         assert t.exset(key, 1.1)
-        assert t.exincrbyfloat(key, 2.2, pxat=pxat) == approx(3.3)
+        assert t.exincrbyfloat(key, 2.2, pxat=pxat) == pytest.approx(3.3)
         # due to network delay, pttl may be greater than 10000.
         assert 0 < t.pttl(key) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
@@ -367,7 +366,7 @@ class TestTairString:
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
 
         assert t.exset(key, 1.1)
-        assert t.exincrbyfloat(key, 2.2, pxat=expire_at) == approx(3.3)
+        assert t.exincrbyfloat(key, 2.2, pxat=expire_at) == pytest.approx(3.3)
         # due to network delay, pttl may be greater than 10000.
         assert 0 < t.pttl(key) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
@@ -377,13 +376,13 @@ class TestTairString:
 
         assert t.exincrbyfloat(key1, 1.1, nx=True) == 1.1
         result = t.exget(key1)
-        assert float(result.value) == approx(1.1)
+        assert float(result.value) == pytest.approx(1.1)
         assert result.version == 1
 
         assert t.exset(key2, 1.1)
         assert t.exincrbyfloat(key2, 2.2, nx=True) is None
         result = t.exget(key2)
-        assert float(result.value) == approx(1.1)
+        assert float(result.value) == pytest.approx(1.1)
         assert result.version == 1
 
     def test_exincrbyfloat_xx(self, t: Tair):
@@ -394,40 +393,40 @@ class TestTairString:
         assert not t.exists(key1)
 
         assert t.exset(key2, 1.1)
-        assert t.exincrbyfloat(key2, 2.2, xx=True) == approx(3.3)
+        assert t.exincrbyfloat(key2, 2.2, xx=True) == pytest.approx(3.3)
         result = t.exget(key2)
-        assert float(result.value) == approx(3.3)
+        assert float(result.value) == pytest.approx(3.3)
         assert result.version == 2
 
     def test_exincrbyfloat_ver(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 1.1)
-        assert t.exincrbyfloat(key, 2.2, ver=1) == approx(3.3)
+        assert t.exincrbyfloat(key, 2.2, ver=1) == pytest.approx(3.3)
         result = t.exget(key)
-        assert float(result.value) == approx(3.3)
+        assert float(result.value) == pytest.approx(3.3)
         assert result.version == 2
 
         assert t.exset(key, 1.1)
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exincrbyfloat(key, 2.2, ver=10)
 
     def test_exincrbyfloat_abs(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 1.1)
-        assert t.exincrbyfloat(key, 2.2, abs=100) == approx(3.3)
+        assert t.exincrbyfloat(key, 2.2, abs=100) == pytest.approx(3.3)
         result = t.exget(key)
-        assert float(result.value) == approx(3.3)
+        assert float(result.value) == pytest.approx(3.3)
         assert result.version == 100
 
     def test_exincrbyfloat_overflow(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
         assert t.exset(key, 9.1)
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exincrbyfloat(key, 1.1, maxval=10)
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exincrbyfloat(key, 0.1, minval=100)
 
     def test_excas_success(self, t: Tair):

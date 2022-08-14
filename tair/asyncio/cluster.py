@@ -1,8 +1,8 @@
 from typing import List, Optional
 
-from tair.commands import TairCommands, set_tair_response_callback
+from redis.asyncio.cluster import ClusterNode, RedisCluster
 
-from redis.asyncio.cluster import RedisCluster, ClusterNode
+from tair.commands import TairCommands, set_tair_response_callback
 
 
 class TairCluster(RedisCluster, TairCommands):

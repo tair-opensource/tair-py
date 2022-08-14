@@ -1,7 +1,8 @@
+from datetime import datetime
+
 import pytest
 
 from tair import Tair
-from datetime import datetime
 
 # change the following configuration for your Tair.
 TAIR_HOST = "localhost"

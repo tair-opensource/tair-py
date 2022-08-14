@@ -1,10 +1,10 @@
 from typing import MutableMapping, Optional, Union
 
-from tair.typing import ResponseCallbackT
-from tair.commands import TairCommands
-
 from redis import ConnectionPool
 from redis.asyncio.client import Pipeline as RedisPipeline
+
+from tair.commands import TairCommands
+from tair.typing import ResponseCallbackT
 
 
 class Pipeline(RedisPipeline, TairCommands):

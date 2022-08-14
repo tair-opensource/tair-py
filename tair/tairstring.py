@@ -2,8 +2,8 @@ import datetime
 import time
 from typing import List, Optional, Union
 
-from .exceptions import DataError
-from .typing import (
+from tair.exceptions import DataError
+from tair.typing import (
     AbsExpiryT,
     CommandsProtocol,
     EncodableT,

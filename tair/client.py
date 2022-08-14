@@ -1,7 +1,7 @@
-from .commands import TairCommands, set_tair_response_callback
-from .pipeline import Pipeline
-
 from redis import ConnectionPool, Redis
+
+from tair.commands import TairCommands, set_tair_response_callback
+from tair.pipeline import Pipeline
 
 
 class Tair(Redis, TairCommands):

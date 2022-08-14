@@ -1,29 +1,27 @@
 from typing import Union
 
-from .tairhash import (
-    TairHashCommands,
-    parse_exhincrbyfloat,
-    parse_exhgetwithver,
-    parse_exhmgetwithver,
-    parse_exhgetall,
-    parse_exhscan,
-)
-
-from .tairstring import (
-    TairStringCommands,
-    parse_exset,
-    parse_exget,
-    parse_excas,
-    parse_exincrbyfloat,
-)
-
-from .tairzset import TairZsetCommands, parse_tair_zset_items
-from .tairbloom import TairBloomCommands
-from .tairroaring import TairRoaringCommands, parse_tr_scan
-from .tairsearch import TairSearchCommands, ScandocidResult
-
 from redis import Redis
 from redis.asyncio import Redis as AsyncRedis
+
+from tair.tairbloom import TairBloomCommands
+from tair.tairhash import (
+    TairHashCommands,
+    parse_exhgetall,
+    parse_exhgetwithver,
+    parse_exhincrbyfloat,
+    parse_exhmgetwithver,
+    parse_exhscan,
+)
+from tair.tairroaring import TairRoaringCommands, parse_tr_scan
+from tair.tairsearch import ScandocidResult, TairSearchCommands
+from tair.tairstring import (
+    TairStringCommands,
+    parse_excas,
+    parse_exget,
+    parse_exincrbyfloat,
+    parse_exset,
+)
+from tair.tairzset import TairZsetCommands, parse_tair_zset_items
 
 
 class TairCommands(
