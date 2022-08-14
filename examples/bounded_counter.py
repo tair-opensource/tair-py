@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 import time
-from typing import List
 from threading import Thread
-from tair import Tair, ResponseError
+from typing import List
+
+from tair import ResponseError, Tair
 
 # change the following configuration for your Tair.
 TAIR_HOST = "localhost"

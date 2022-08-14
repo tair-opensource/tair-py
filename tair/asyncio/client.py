@@ -1,12 +1,11 @@
 from typing import Mapping, Optional, Union
 
-
-from .pipeline import Pipeline
-from tair.commands import TairCommands, set_tair_response_callback
-
 from redis import ConnectionPool
-from redis.retry import Retry
 from redis.asyncio.client import Redis
+from redis.retry import Retry
+
+from tair.commands import TairCommands, set_tair_response_callback
+from tair.pipeline import Pipeline
 
 
 class Tair(Redis, TairCommands):

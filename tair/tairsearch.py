@@ -1,12 +1,6 @@
-from sqlite3 import Cursor
 from typing import Dict, Iterable, List, Optional
 
-from .typing import (
-    CommandsProtocol,
-    EncodableT,
-    KeyT,
-    ResponseT,
-)
+from tair.typing import CommandsProtocol, EncodableT, KeyT, ResponseT
 
 
 class ScandocidResult:

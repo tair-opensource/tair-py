@@ -1,8 +1,8 @@
-from .commands import TairCommands, set_tair_response_callback
-from .pipeline import ClusterPipeline
-
 from redis import RedisCluster
 from redis.exceptions import RedisClusterException
+
+from tair.commands import TairCommands, set_tair_response_callback
+from tair.pipeline import ClusterPipeline
 
 
 class TairCluster(RedisCluster, TairCommands):

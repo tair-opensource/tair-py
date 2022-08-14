@@ -4,6 +4,7 @@ import time
 import uuid
 from threading import Thread
 from typing import List
+
 from tair import Tair, TairError
 
 # change the following configuration for your Tair.

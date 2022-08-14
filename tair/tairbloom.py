@@ -1,11 +1,6 @@
 from typing import Iterable, List, Optional
 
-from .typing import (
-    CommandsProtocol,
-    EncodableT,
-    KeyT,
-    ResponseT,
-)
+from tair.typing import CommandsProtocol, EncodableT, KeyT, ResponseT
 
 
 class TairBloomCommands(CommandsProtocol):

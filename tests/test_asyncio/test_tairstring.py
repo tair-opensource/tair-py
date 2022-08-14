@@ -1,15 +1,12 @@
-import pytest
-
-
 import datetime
 import time
 import uuid
 
-from pytest import approx
-
-from .conftest import get_server_time, NETWORK_DELAY_CALIBRATION_VALUE
+import pytest
 
 from tair import DataError, ResponseError
+
+from .conftest import NETWORK_DELAY_CALIBRATION_VALUE, get_server_time
 
 
 class TestTairString:
@@ -323,7 +320,7 @@ class TestTairString:
         key = "key_" + str(uuid.uuid4())
 
         assert await t.exset(key, 1.1)
-        assert await t.exincrbyfloat(key, 2.2) == approx(3.3)
+        assert await t.exincrbyfloat(key, 2.2) == pytest.approx(3.3)
         result = await t.exget(key)
         assert float(result.value) == pytest.approx(3.3)
         assert result.version == 2
@@ -333,7 +330,7 @@ class TestTairString:
         key = "key_" + str(uuid.uuid4())
 
         assert await t.exset(key, 1.1)
-        assert await t.exincrbyfloat(key, 2.2, ex=10) == approx(3.3)
+        assert await t.exincrbyfloat(key, 2.2, ex=10) == pytest.approx(3.3)
         assert 0 < await t.ttl(key) <= 10
 
         # ex should not be a float.
@@ -346,7 +343,7 @@ class TestTairString:
         expire_at = datetime.timedelta(seconds=10)
 
         assert await t.exset(key, 1.1)
-        assert await t.exincrbyfloat(key, 2.2, ex=expire_at) == approx(3.3)
+        assert await t.exincrbyfloat(key, 2.2, ex=expire_at) == pytest.approx(3.3)
         assert 0 < await t.ttl(key) <= 10
 
     @pytest.mark.asyncio
@@ -354,7 +351,7 @@ class TestTairString:
         key = "key_" + str(uuid.uuid4())
 
         assert await t.exset(key, 1.1)
-        assert await t.exincrbyfloat(key, 2.2, px=10000) == approx(3.3)
+        assert await t.exincrbyfloat(key, 2.2, px=10000) == pytest.approx(3.3)
         assert 0 < await t.pttl(key) <= 10000
 
         # px should not be a float.
@@ -367,7 +364,7 @@ class TestTairString:
         expire_at = datetime.timedelta(milliseconds=10000)
 
         assert await t.exset(key, 1.1)
-        assert await t.exincrbyfloat(key, 2.2, px=expire_at) == approx(3.3)
+        assert await t.exincrbyfloat(key, 2.2, px=expire_at) == pytest.approx(3.3)
         assert 0 < await t.pttl(key) <= 10000
 
     @pytest.mark.asyncio
@@ -377,7 +374,7 @@ class TestTairString:
         exat = int(time.mktime(expire_at.timetuple()))
 
         assert await t.exset(key, 1.1)
-        assert await t.exincrbyfloat(key, 2.2, exat=exat) == approx(3.3)
+        assert await t.exincrbyfloat(key, 2.2, exat=exat) == pytest.approx(3.3)
         assert 0 < await t.ttl(key) <= 10
 
     @pytest.mark.asyncio
@@ -386,7 +383,7 @@ class TestTairString:
         expire_at = await get_server_time(t) + datetime.timedelta(seconds=10)
 
         assert await t.exset(key, 1.1)
-        assert await t.exincrbyfloat(key, 2.2, exat=expire_at) == approx(3.3)
+        assert await t.exincrbyfloat(key, 2.2, exat=expire_at) == pytest.approx(3.3)
         assert 0 < await t.ttl(key) <= 10
 
     @pytest.mark.asyncio
@@ -396,7 +393,7 @@ class TestTairString:
         pxat = int(time.mktime(expire_at.timetuple())) * 1000
 
         assert await t.exset(key, 1.1)
-        assert await t.exincrbyfloat(key, 2.2, pxat=pxat) == approx(3.3)
+        assert await t.exincrbyfloat(key, 2.2, pxat=pxat) == pytest.approx(3.3)
         # due to network delay, pttl may be greater than 10000.
         assert 0 < await t.pttl(key) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
@@ -406,7 +403,7 @@ class TestTairString:
         expire_at = await get_server_time(t) + datetime.timedelta(seconds=10)
 
         assert await t.exset(key, 1.1)
-        assert await t.exincrbyfloat(key, 2.2, pxat=expire_at) == approx(3.3)
+        assert await t.exincrbyfloat(key, 2.2, pxat=expire_at) == pytest.approx(3.3)
         # due to network delay, pttl may be greater than 10000.
         assert 0 < await t.pttl(key) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
@@ -417,13 +414,13 @@ class TestTairString:
 
         assert await t.exincrbyfloat(key1, 1.1, nx=True) == 1.1
         result = await t.exget(key1)
-        assert float(result.value) == approx(1.1)
+        assert float(result.value) == pytest.approx(1.1)
         assert result.version == 1
 
         assert await t.exset(key2, 1.1)
         assert await t.exincrbyfloat(key2, 2.2, nx=True) is None
         result = await t.exget(key2)
-        assert float(result.value) == approx(1.1)
+        assert float(result.value) == pytest.approx(1.1)
         assert result.version == 1
 
     @pytest.mark.asyncio
@@ -435,9 +432,9 @@ class TestTairString:
         assert not await t.exists(key1)
 
         assert await t.exset(key2, 1.1)
-        assert await t.exincrbyfloat(key2, 2.2, xx=True) == approx(3.3)
+        assert await t.exincrbyfloat(key2, 2.2, xx=True) == pytest.approx(3.3)
         result = await t.exget(key2)
-        assert float(result.value) == approx(3.3)
+        assert float(result.value) == pytest.approx(3.3)
         assert result.version == 2
 
     @pytest.mark.asyncio
@@ -445,9 +442,9 @@ class TestTairString:
         key = "key_" + str(uuid.uuid4())
 
         assert await t.exset(key, 1.1)
-        assert await t.exincrbyfloat(key, 2.2, ver=1) == approx(3.3)
+        assert await t.exincrbyfloat(key, 2.2, ver=1) == pytest.approx(3.3)
         result = await t.exget(key)
-        assert float(result.value) == approx(3.3)
+        assert float(result.value) == pytest.approx(3.3)
         assert result.version == 2
 
         assert await t.exset(key, 1.1)
@@ -459,9 +456,9 @@ class TestTairString:
         key = "key_" + str(uuid.uuid4())
 
         assert await t.exset(key, 1.1)
-        assert await t.exincrbyfloat(key, 2.2, abs=100) == approx(3.3)
+        assert await t.exincrbyfloat(key, 2.2, abs=100) == pytest.approx(3.3)
         result = await t.exget(key)
-        assert float(result.value) == approx(3.3)
+        assert float(result.value) == pytest.approx(3.3)
         assert result.version == 100
 
     @pytest.mark.asyncio

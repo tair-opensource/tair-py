@@ -1,6 +1,3 @@
-from .client import Tair
-from .cluster import TairCluster
-
 from redis.asyncio.connection import (
     BlockingConnectionPool,
     Connection,
@@ -30,6 +27,9 @@ from redis.exceptions import (
     TimeoutError,
     WatchError,
 )
+
+from tair.asyncio.client import Tair
+from tair.asyncio.cluster import TairCluster
 
 TairError = RedisError
 

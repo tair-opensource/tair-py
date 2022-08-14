@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import asyncio
+
 from tair import ResponseError
 from tair.asyncio import Tair
 

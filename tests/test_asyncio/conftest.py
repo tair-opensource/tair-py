@@ -1,8 +1,10 @@
-import pytest_asyncio
 from datetime import datetime
-from tair.asyncio import Tair
-from ..conftest import TAIR_HOST, TAIR_PORT, TAIR_DB, TAIR_USERNAME, TAIR_PASSWORD
 
+import pytest_asyncio
+
+from tair.asyncio import Tair
+
+from ..conftest import TAIR_DB, TAIR_HOST, TAIR_PASSWORD, TAIR_PORT, TAIR_USERNAME
 
 # due to network delay, ttl and pttl are not very accurate,
 # so we set a calibration value.

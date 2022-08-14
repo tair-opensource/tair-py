@@ -2,26 +2,25 @@ import datetime
 import time
 import uuid
 
-from tair import Tair
-from pytest import approx, raises
+import pytest
 
 from tair import (
+    DataError,
     ExhscanResult,
     FieldValueItem,
-    ValueVersionItem,
-    DataError,
     ResponseError,
+    Tair,
+    ValueVersionItem,
 )
-
 from tair.tairhash import (
-    parse_exhincrbyfloat,
-    parse_exhgetwithver,
-    parse_exhmgetwithver,
     parse_exhgetall,
+    parse_exhgetwithver,
+    parse_exhincrbyfloat,
+    parse_exhmgetwithver,
     parse_exhscan,
 )
 
-from .conftest import get_server_time, NETWORK_DELAY_CALIBRATION_VALUE
+from .conftest import NETWORK_DELAY_CALIBRATION_VALUE, get_server_time
 
 
 class TestTairHash:
@@ -48,7 +47,7 @@ class TestTairHash:
         assert 0 < t.exhttl(key, field) <= 10
 
         # ex should not be a float.
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exhset(key, field, value, ex=10.0)
 
     def test_exhset_ex_timedelta(self, t: Tair):
@@ -69,7 +68,7 @@ class TestTairHash:
         assert 0 < t.exhpttl(key, field) <= 10000
 
         # px should not be a float.
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exhset(key, field, value, px=10000.0)
 
     def test_exhset_px_timedelta(self, t: Tair):
@@ -151,7 +150,7 @@ class TestTairHash:
         assert t.exhset(key, field, value1, abs=10) == 1
         assert t.exhset(key, field, value2, ver=10) == 0
 
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exhset(key, field, value3, ver=100)
 
     def test_exhset_abs(self, t: Tair):
@@ -214,7 +213,7 @@ class TestTairHash:
         assert t.exhpexpireat(key, field, pxat, ver=10) == 1
         assert 0 < t.exhpttl(key, field) <= 10000
 
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exhpexpireat(key, field, pxat=pxat, ver=100)
 
     def test_exhpexpireat_abs(self, t: Tair):
@@ -252,7 +251,7 @@ class TestTairHash:
         assert t.exhpexpire(key, field, px=10000, ver=10) == 1
         assert 0 < t.exhpttl(key, field) <= 10000
 
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exhpexpire(key, field, px=10000, ver=100)
 
     def test_exhpexpire_abs(self, t: Tair):
@@ -287,7 +286,7 @@ class TestTairHash:
         assert t.exhexpireat(key, field, exat=exat, ver=10) == 1
         assert 0 < t.exhttl(key, field) <= 10
 
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exhexpireat(key, field, exat=exat, ver=100)
 
     def test_exhexpireat_abs(self, t: Tair):
@@ -320,7 +319,7 @@ class TestTairHash:
         assert t.exhexpire(key, field, ex=10, ver=10) == 1
         assert 0 < t.exhttl(key, field) <= 10
 
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exhexpire(key, field, ex=10, ver=100)
 
     def test_exhexpire_abs(self, t: Tair):
@@ -367,7 +366,7 @@ class TestTairHash:
         assert 0 < t.exhttl(key, field) <= 10
 
         # ex should not be a float.
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exhincrby(key, field, 20, ex=10.0)
 
     def test_exhincrby_ex_timedelta(self, t: Tair):
@@ -388,7 +387,7 @@ class TestTairHash:
         assert 0 < t.exhpttl(key, field) <= 10000
 
         # px should not be a float.
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exhincrby(key, field, 20, px=10000.0)
 
     def test_exhincrby_px_timedelta(self, t: Tair):
@@ -411,7 +410,7 @@ class TestTairHash:
         assert 0 < t.exhttl(key, field) <= 10
 
         # ex should not be a float.
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exhincrby(key, field, 20, ex=10.0)
 
     def test_exhincrby_exat_timedelta(self, t: Tair):
@@ -454,7 +453,7 @@ class TestTairHash:
         assert t.exhver(key, field1) == 2
 
         assert t.exhset(key, field2, 10) == 1
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exhincrby(key, field2, 20, ver=10)
 
     def test_exhincrby_abs(self, t: Tair):
@@ -471,9 +470,9 @@ class TestTairHash:
         field = "field_" + str(uuid.uuid4())
 
         assert t.exhset(key, field, 10)
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exhincrby(key, field, 20, maxval=10)
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exhincrby(key, field, 20, minval=100)
 
     def test_exhincrby_keepttl(self, t: Tair):
@@ -491,19 +490,19 @@ class TestTairHash:
         field = "field_" + str(uuid.uuid4())
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2) == approx(3.3)
-        assert float(t.exhget(key, field)) == approx(3.3)
+        assert t.exhincrbyfloat(key, field, 2.2) == pytest.approx(3.3)
+        assert float(t.exhget(key, field)) == pytest.approx(3.3)
 
     def test_exhincrbyfloat_ex(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
         field = "field_" + str(uuid.uuid4())
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, ex=10) == approx(3.3)
+        assert t.exhincrbyfloat(key, field, 2.2, ex=10) == pytest.approx(3.3)
         assert 0 < t.exhttl(key, field) <= 10
 
         # ex should not be a float.
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exhincrbyfloat(key, field, 2.2, ex=10.0)
 
     def test_exhincrbyfloat_ex_timedelta(self, t: Tair):
@@ -512,7 +511,7 @@ class TestTairHash:
         ex = datetime.timedelta(seconds=10)
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, ex=ex) == approx(3.3)
+        assert t.exhincrbyfloat(key, field, 2.2, ex=ex) == pytest.approx(3.3)
         assert 0 < t.exhttl(key, field) <= 10
 
     def test_exhincrbyfloat_px(self, t: Tair):
@@ -520,11 +519,11 @@ class TestTairHash:
         field = "field_" + str(uuid.uuid4())
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, px=10000) == approx(3.3)
+        assert t.exhincrbyfloat(key, field, 2.2, px=10000) == pytest.approx(3.3)
         assert 0 < t.exhpttl(key, field) <= 10000
 
         # px should not be a float.
-        with raises(DataError):
+        with pytest.raises(DataError):
             t.exhincrbyfloat(key, field, 2.2, px=10000.0)
 
     def test_exhincrbyfloat_px_timedelta(self, t: Tair):
@@ -533,7 +532,7 @@ class TestTairHash:
         px = datetime.timedelta(milliseconds=10000)
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, px=px) == approx(3.3)
+        assert t.exhincrbyfloat(key, field, 2.2, px=px) == pytest.approx(3.3)
         assert 0 < t.exhpttl(key, field) <= 10000
 
     def test_exhincrbyfloat_exat(self, t: Tair):
@@ -543,7 +542,7 @@ class TestTairHash:
         exat = int(time.mktime(expire_at.timetuple()))
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, exat=exat) == approx(3.3)
+        assert t.exhincrbyfloat(key, field, 2.2, exat=exat) == pytest.approx(3.3)
         assert 0 < t.exhttl(key, field) <= 10
 
     def test_exhincrbyfloat_exat_timedelta(self, t: Tair):
@@ -552,7 +551,7 @@ class TestTairHash:
         expire_at = get_server_time(t) + datetime.timedelta(seconds=10)
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, exat=expire_at) == approx(3.3)
+        assert t.exhincrbyfloat(key, field, 2.2, exat=expire_at) == pytest.approx(3.3)
         assert 0 < t.exhttl(key, field) <= 10
 
     def test_exhincrbyfloat_pxat(self, t: Tair):
@@ -562,7 +561,7 @@ class TestTairHash:
         pxat = int(time.mktime(expire_at.timetuple())) * 1000
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, pxat=pxat) == approx(3.3)
+        assert t.exhincrbyfloat(key, field, 2.2, pxat=pxat) == pytest.approx(3.3)
         assert 0 < t.exhpttl(key, field) <= 10000
 
     def test_exhincrbyfloat_pxat_timedelta(self, t: Tair):
@@ -571,7 +570,7 @@ class TestTairHash:
         pxat = get_server_time(t) + datetime.timedelta(seconds=10)
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, pxat=pxat) == approx(3.3)
+        assert t.exhincrbyfloat(key, field, 2.2, pxat=pxat) == pytest.approx(3.3)
         # due to network delay, pttl may be greater than 10000.
         assert 0 < t.exhpttl(key, field) <= (10000 + NETWORK_DELAY_CALIBRATION_VALUE)
 
@@ -581,12 +580,12 @@ class TestTairHash:
         field2 = "field_" + str(uuid.uuid4())
 
         assert t.exhset(key, field1, 1.1) == 1
-        assert t.exhincrbyfloat(key, field1, 2.2, ver=1) == approx(3.3)
-        assert float(t.exhget(key, field1)) == approx(3.3)
+        assert t.exhincrbyfloat(key, field1, 2.2, ver=1) == pytest.approx(3.3)
+        assert float(t.exhget(key, field1)) == pytest.approx(3.3)
         assert t.exhver(key, field1) == 2
 
         assert t.exhset(key, field2, 10) == 1
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exhincrbyfloat(key, field2, 2.2, ver=10)
 
     def test_exhincrbyfloat_abs(self, t: Tair):
@@ -594,8 +593,8 @@ class TestTairHash:
         field = "field_" + str(uuid.uuid4())
 
         assert t.exhset(key, field, 1.1) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, abs=100) == approx(3.3)
-        assert float(t.exhget(key, field)) == approx(3.3)
+        assert t.exhincrbyfloat(key, field, 2.2, abs=100) == pytest.approx(3.3)
+        assert float(t.exhget(key, field)) == pytest.approx(3.3)
         assert t.exhver(key, field) == 100
 
     def test_exhincrbyfloat_overflow(self, t: Tair):
@@ -603,9 +602,9 @@ class TestTairHash:
         field = "field_" + str(uuid.uuid4())
 
         assert t.exhset(key, field, 9.1)
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exhincrbyfloat(key, field, 1.1, maxval=10.0)
-        with raises(ResponseError):
+        with pytest.raises(ResponseError):
             t.exhincrbyfloat(key, field, 2.2, minval=100.0)
 
     def test_exhincrbyfloat_keepttl(self, t: Tair):
@@ -615,7 +614,7 @@ class TestTairHash:
         pxat = int(time.mktime(exat.timetuple())) * 1000
 
         assert t.exhset(key, field, 1.1, pxat=pxat) == 1
-        assert t.exhincrbyfloat(key, field, 2.2, keepttl=True) == approx(3.3)
+        assert t.exhincrbyfloat(key, field, 2.2, keepttl=True) == pytest.approx(3.3)
         assert 0 < t.exhpttl(key, field) <= 10000
 
     def test_exhgetwithver(self, t: Tair):

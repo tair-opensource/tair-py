@@ -1,10 +1,9 @@
 import datetime
 import time
+from typing import Dict, Iterable, List, Optional, Union
 
-from typing import Dict, List, Iterable, Optional, Union
-
-from .exceptions import DataError
-from .typing import (
+from tair.exceptions import DataError
+from tair.typing import (
     AbsExpiryT,
     CommandsProtocol,
     EncodableT,

@@ -1,13 +1,6 @@
-from .client import Tair
-from .cluster import TairCluster
-
-from .tairstring import ExgetResult, ExcasResult
-from .tairhash import ExhscanResult, FieldValueItem, ValueVersionItem
-from .tairzset import TairZsetItem
-from .tairroaring import TrScanResult
-from .tairsearch import ScandocidResult
-
-from .exceptions import (
+from tair.client import Tair
+from tair.cluster import TairCluster
+from tair.exceptions import (
     AuthenticationError,
     AuthenticationWrongNumberOfArgsError,
     BusyLoadingError,
@@ -17,12 +10,16 @@ from .exceptions import (
     InvalidResponse,
     PubSubError,
     ReadOnlyError,
-    TairError,
     ResponseError,
+    TairError,
     TimeoutError,
     WatchError,
 )
-
+from tair.tairhash import ExhscanResult, FieldValueItem, ValueVersionItem
+from tair.tairroaring import TrScanResult
+from tair.tairsearch import ScandocidResult
+from tair.tairstring import ExcasResult, ExgetResult
+from tair.tairzset import TairZsetItem
 
 __all__ = [
     "Tair",

@@ -1,15 +1,9 @@
 from typing import Iterable, List, Mapping, Optional
 
-
-from .exceptions import DataError
-from .typing import (
-    AnyKeyT,
-    EncodableT,
-    KeyT,
-    ResponseT,
-)
-
 from redis.typing import CommandsProtocol
+
+from tair.exceptions import DataError
+from tair.typing import AnyKeyT, EncodableT, KeyT, ResponseT
 
 
 class TairZsetItem:

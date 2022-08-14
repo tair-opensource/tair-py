@@ -1,8 +1,8 @@
 import uuid
 
-from pytest import approx
+import pytest
 
-from tair import TrScanResult, Tair
+from tair import Tair, TrScanResult
 
 
 class TestTairRoaring:
@@ -240,8 +240,8 @@ class TestTairRoaring:
         assert t.tr_setbits(key1, [1, 2, 3, 5, 8]) == 5
         assert t.tr_setbits(key2, [1, 2, 3, 5, 8]) == 5
         assert t.tr_setbits(key3, [1, 3, 5]) == 3
-        assert t.tr_jaccard(key1, key2) == approx(1.0)
-        assert t.tr_jaccard(key2, key3) == approx(0.6)
+        assert t.tr_jaccard(key1, key2) == pytest.approx(1.0)
+        assert t.tr_jaccard(key2, key3) == pytest.approx(0.6)
 
     def test_tr_contains(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())

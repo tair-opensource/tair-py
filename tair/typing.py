@@ -1,9 +1,6 @@
-from typing import (
-    Any,
-    Awaitable,
-    Union,
-)
+from typing import Any, Awaitable, Union
 
+from redis.asyncio.client import ResponseCallbackT
 from redis.typing import (
     AbsExpiryT,
     AnyKeyT,
@@ -13,7 +10,5 @@ from redis.typing import (
     FieldT,
     KeyT,
 )
-
-from redis.asyncio.client import ResponseCallbackT
 
 ResponseT = Union[Awaitable, Any]

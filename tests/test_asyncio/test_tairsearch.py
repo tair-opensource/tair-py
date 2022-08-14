@@ -1,8 +1,9 @@
 import json
-import pytest
 import uuid
-from pytest import approx
-from tair import Tair, ScandocidResult
+
+import pytest
+
+from tair import ScandocidResult, Tair
 
 
 class TestTairSearch:
@@ -194,9 +195,9 @@ class TestTairSearch:
 
         assert await t.tft_createindex(index, mappings)
         assert await t.tft_adddoc(index, document, doc_id="00001") == '{"_id":"00001"}'
-        assert await t.tft_incrfloatdocfield(index, "00001", "price", 2.2) == approx(
-            3.3
-        )
+        assert await t.tft_incrfloatdocfield(
+            index, "00001", "price", 2.2
+        ) == pytest.approx(3.3)
 
     @pytest.mark.asyncio
     async def test_tft_getdoc(self, t: Tair):
