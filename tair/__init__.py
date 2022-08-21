@@ -20,6 +20,7 @@ from tair.tairroaring import TrScanResult
 from tair.tairsearch import ScandocidResult
 from tair.tairstring import ExcasResult, ExgetResult
 from tair.tairzset import TairZsetItem
+from tair.tairgis import TairGisSearchMember, TairGisSearchRadius
 
 __all__ = [
     "Tair",
@@ -32,6 +33,8 @@ __all__ = [
     "TrScanResult",
     "ScandocidResult",
     "TairZsetItem",
+    "TairGisSearchMember",
+    "TairGisSearchRadius",
     "AuthenticationError",
     "AuthenticationWrongNumberOfArgsError",
     "BusyLoadingError",

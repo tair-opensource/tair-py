@@ -22,6 +22,7 @@ from tair.tairstring import (
     parse_exset,
 )
 from tair.tairzset import TairZsetCommands, parse_tair_zset_items
+from tair.tairgis import TairGisCommands
 
 
 class TairCommands(
@@ -31,6 +32,7 @@ class TairCommands(
     TairBloomCommands,
     TairRoaringCommands,
     TairSearchCommands,
+    TairGisCommands,
 ):
     pass
 
