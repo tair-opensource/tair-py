@@ -15,12 +15,12 @@ from tair.exceptions import (
     TimeoutError,
     WatchError,
 )
+from tair.tairgis import TairGisSearchMember, TairGisSearchRadius
 from tair.tairhash import ExhscanResult, FieldValueItem, ValueVersionItem
 from tair.tairroaring import TrScanResult
 from tair.tairsearch import ScandocidResult
 from tair.tairstring import ExcasResult, ExgetResult
 from tair.tairzset import TairZsetItem
-from tair.tairgis import TairGisSearchMember, TairGisSearchRadius
 
 __all__ = [
     "Tair",

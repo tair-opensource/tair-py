@@ -1,6 +1,6 @@
 import uuid
 
-from tair import Tair, TairGisSearchRadius, TairGisSearchMember
+from tair import Tair, TairGisSearchMember, TairGisSearchRadius
 
 
 class TestTairGis:
