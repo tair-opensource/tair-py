@@ -16,12 +16,56 @@ class TairGisSearchRadius:
         self.distance = distance
         self.unit = unit
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, TairGisSearchRadius):
+            return False
+        return (
+            self.longitude == other.longitude
+            and self.latitude == other.latitude
+            and self.distance == other.distance
+            and self.unit == other.unit
+        )
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+
+    def __repr__(self) -> str:
+        return (
+            "{"
+            + f"longitude: {self.longitude}, "
+            + f"latitude: {self.latitude}, "
+            + f"distance: {self.distance}, "
+            + f"unit: {self.unit}"
+            + "}"
+        )
+
 
 class TairGisSearchMember:
     def __init__(self, field: FieldT, distance: float, unit) -> None:
         self.field = field
         self.distance = distance
         self.unit = unit
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, TairGisSearchMember):
+            return False
+        return (
+            self.field == other.field
+            and self.distance == other.distance
+            and self.unit == other.unit
+        )
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+
+    def __repr__(self) -> str:
+        return (
+            "{"
+            + f"field: {self.field}, "
+            + f"distance: {self.distance}, "
+            + f"unit: {self.unit}"
+            + "}"
+        )
 
 
 class TairGisCommands(CommandsProtocol):
