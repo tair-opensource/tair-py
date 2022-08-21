@@ -15,6 +15,7 @@ from tair.exceptions import (
     TimeoutError,
     WatchError,
 )
+from tair.tairgis import TairGisSearchMember, TairGisSearchRadius
 from tair.tairhash import ExhscanResult, FieldValueItem, ValueVersionItem
 from tair.tairroaring import TrScanResult
 from tair.tairsearch import ScandocidResult
@@ -32,6 +33,8 @@ __all__ = [
     "TrScanResult",
     "ScandocidResult",
     "TairZsetItem",
+    "TairGisSearchMember",
+    "TairGisSearchRadius",
     "AuthenticationError",
     "AuthenticationWrongNumberOfArgsError",
     "BusyLoadingError",

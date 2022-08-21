@@ -5,6 +5,7 @@ from redis.asyncio import Redis as AsyncRedis
 
 from tair.tairbloom import TairBloomCommands
 from tair.tairdoc import TairDocCommands
+from tair.tairgis import TairGisCommands
 from tair.tairhash import (
     TairHashCommands,
     parse_exhgetall,
@@ -32,6 +33,7 @@ class TairCommands(
     TairBloomCommands,
     TairRoaringCommands,
     TairSearchCommands,
+    TairGisCommands,
     TairDocCommands,
 ):
     pass
