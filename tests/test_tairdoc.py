@@ -3,7 +3,7 @@ import uuid
 from tair import Tair
 
 
-class TestTairBloom:
+class TestTairDoc:
     def test_json_set(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
 
