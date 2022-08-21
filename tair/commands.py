@@ -4,6 +4,7 @@ from redis import Redis
 from redis.asyncio import Redis as AsyncRedis
 
 from tair.tairbloom import TairBloomCommands
+from tair.tairdoc import TairDocCommands
 from tair.tairhash import (
     TairHashCommands,
     parse_exhgetall,
@@ -31,6 +32,7 @@ class TairCommands(
     TairBloomCommands,
     TairRoaringCommands,
     TairSearchCommands,
+    TairDocCommands,
 ):
     pass
 
@@ -93,6 +95,9 @@ TAIR_RESPONSE_CALLBACKS = {
     "TFT.SEARCH": lambda resp: resp.decode(),
     "TFT.GETSUG": lambda resp: [i.decode() for i in resp],
     "TFT.GETALLSUGS": lambda resp: [i.decode() for i in resp],
+    # TairDoc
+    "JSON.SET": lambda resp: None if resp is None else resp == b"OK",
+    "JSON.TYPE": str_if_bytes,
 }
 
 
