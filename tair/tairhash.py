@@ -388,24 +388,27 @@ class TairHashCommands(CommandsProtocol):
     def exhgetall(self, key: KeyT) -> ResponseT:
         return self.execute_command("EXHGETALL", key)
 
-    def exhscan(
-        self,
-        key: KeyT,
-        op: str,
-        subkey: KeyT,
-        match: Optional[str] = None,
-        count: Optional[int] = None,
-    ) -> ResponseT:
-        pieces: List[EncodableT] = [key, op, subkey]
+    # the open source version of exhscan is inconsistent with the enterprise version,
+    # so this method is temporarily commented out.
 
-        if match is not None:
-            pieces.append("MATCH")
-            pieces.append(match)
-        if count is not None:
-            pieces.append("COUNT")
-            pieces.append(count)
+    # def exhscan(
+    #     self,
+    #     key: KeyT,
+    #     op: str,
+    #     subkey: KeyT,
+    #     match: Optional[str] = None,
+    #     count: Optional[int] = None,
+    # ) -> ResponseT:
+    #     pieces: List[EncodableT] = [key, op, subkey]
 
-        return self.execute_command("EXHSCAN", *pieces)
+    #     if match is not None:
+    #         pieces.append("MATCH")
+    #         pieces.append(match)
+    #     if count is not None:
+    #         pieces.append("COUNT")
+    #         pieces.append(count)
+
+    #     return self.execute_command("EXHSCAN", *pieces)
 
     def exhdel(self, key: KeyT, fields: Iterable[FieldT]) -> ResponseT:
         return self.execute_command("EXHDEL", key, *fields)
