@@ -20,21 +20,25 @@ from tair.tairhash import ExhscanResult, FieldValueItem, ValueVersionItem
 from tair.tairroaring import TrScanResult
 from tair.tairsearch import ScandocidResult
 from tair.tairstring import ExcasResult, ExgetResult
+from tair.tairts import Aggregation, TairTsSkeyItem
 from tair.tairzset import TairZsetItem
 
 __all__ = [
-    "Tair",
-    "TairCluster",
-    "ExgetResult",
+    "Aggregation",
     "ExcasResult",
+    "ExgetResult",
     "ExhscanResult",
     "FieldValueItem",
-    "ValueVersionItem",
-    "TrScanResult",
     "ScandocidResult",
-    "TairZsetItem",
+    "Tair",
+    "TairCluster",
     "TairGisSearchMember",
     "TairGisSearchRadius",
+    "TairTsSkeyItem",
+    "TairZsetItem",
+    "TrScanResult",
+    "ValueVersionItem",
+    # errors
     "AuthenticationError",
     "AuthenticationWrongNumberOfArgsError",
     "BusyLoadingError",

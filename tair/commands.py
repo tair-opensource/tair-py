@@ -23,6 +23,7 @@ from tair.tairstring import (
     parse_exincrbyfloat,
     parse_exset,
 )
+from tair.tairts import TairTsCommands
 from tair.tairzset import TairZsetCommands, parse_tair_zset_items
 
 
@@ -35,6 +36,7 @@ class TairCommands(
     TairSearchCommands,
     TairGisCommands,
     TairDocCommands,
+    TairTsCommands,
 ):
     pass
 
@@ -100,6 +102,19 @@ TAIR_RESPONSE_CALLBACKS = {
     # TairDoc
     "JSON.SET": lambda resp: None if resp is None else resp == b"OK",
     "JSON.TYPE": str_if_bytes,
+    # TairTs
+    "EXTS.P.CREATE": bool_ok,
+    "EXTS.S.CREATE": bool_ok,
+    "EXTS.S.ALTER": bool_ok,
+    "EXTS.S.ADD": bool_ok,
+    "EXTS.S.MADD": lambda resp: [bool_ok(i) for i in resp],
+    "EXTS.S.INCRBY": bool_ok,
+    "EXTS.S.MINCRBY": lambda resp: [bool_ok(i) for i in resp],
+    "EXTS.S.DEL": bool_ok,
+    "EXTS.S.RAW_MODIFY": bool_ok,
+    "EXTS.S.RAW_MMODIFY": lambda resp: [bool_ok(i) for i in resp],
+    "EXTS.S.RAW_INCRBY": bool_ok,
+    "EXTS.S.RAW_MINCRBY": lambda resp: [bool_ok(i) for i in resp],
 }
 
 
