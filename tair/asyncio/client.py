@@ -81,9 +81,6 @@ class Tair(Redis, TairCommands):
         )
         set_tair_response_callback(self)
 
-    async def initialize(self):
-        await Redis.initialize(self)
-
     def pipeline(self, transaction: bool = True, shard_hint: Optional[str] = None):
         return Pipeline(
             self.connection_pool,

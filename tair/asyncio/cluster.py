@@ -35,6 +35,3 @@ class TairCluster(RedisCluster, TairCommands):
             **kwargs,
         )
         set_tair_response_callback(self)
-
-    async def initialize(self):
-        await RedisCluster.initialize(self)

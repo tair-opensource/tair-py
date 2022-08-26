@@ -28,7 +28,6 @@ async def init() -> bool:
         username=TAIR_USERNAME,
         password=TAIR_PASSWORD,
     )
-    await tair.initialize()
 
     try:
         await tair.exset(KEY, "100")
