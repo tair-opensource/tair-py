@@ -58,6 +58,13 @@ def t() -> Union[Tair, TairCluster]:
     tair.close()
 
 
+@pytest.fixture()
+def tc() -> TairCluster:
+    tair = get_tair_cluster_client()
+    yield tair
+    tair.close()
+
+
 def get_server_time(client) -> datetime:
     seconds, milliseconds = client.time()
     timestamp = float(f"{seconds}.{milliseconds}")
