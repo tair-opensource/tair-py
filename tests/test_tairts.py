@@ -413,22 +413,6 @@ class TestTairTs:
         assert str(TairTsSkeyItem(skey, "*", 1)) == f"{{skey: {skey}, ts: *, value: 1}}"
 
     def test_aggregation_eq(self):
-        skey = "skey_" + str(uuid.uuid4())
-        assert TairTsSkeyItem(skey, "*", 1) == TairTsSkeyItem(skey, "*", 1)
-        assert not TairTsSkeyItem(skey, "*", 1) == TairTsSkeyItem(skey, "*", 2)
-        assert not TairTsSkeyItem(skey, "*", 1) == 1
-
-    def test_aggregation_ne(self):
-        skey = "skey_" + str(uuid.uuid4())
-        assert not TairTsSkeyItem(skey, "*", 1) != TairTsSkeyItem(skey, "*", 1)
-        assert TairTsSkeyItem(skey, "*", 1) != TairTsSkeyItem(skey, "*", 2)
-        assert TairTsSkeyItem(skey, "*", 1) != 1
-
-    def test_tair_ts_skey_item_repr(self):
-        skey = "skey_" + str(uuid.uuid4())
-        assert str(TairTsSkeyItem(skey, "*", 1)) == f"{{skey: {skey}, ts: *, value: 1}}"
-
-    def test_aggregation_eq(self):
         assert Aggregation("MAX", 1) == Aggregation("MAX", 1)
         assert not Aggregation("MAX", 1) == Aggregation("MAX", 2)
         assert not Aggregation("MAX", 1) == 1
