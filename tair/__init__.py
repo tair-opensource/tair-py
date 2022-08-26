@@ -15,6 +15,7 @@ from tair.exceptions import (
     TimeoutError,
     WatchError,
 )
+from tair.taircpc import CpcUpdate2judResult
 from tair.tairgis import TairGisSearchMember, TairGisSearchRadius
 from tair.tairhash import ExhscanResult, FieldValueItem, ValueVersionItem
 from tair.tairroaring import TrScanResult
@@ -25,6 +26,7 @@ from tair.tairzset import TairZsetItem
 
 __all__ = [
     "Aggregation",
+    "CpcUpdate2judResult",
     "ExcasResult",
     "ExgetResult",
     "ExhscanResult",

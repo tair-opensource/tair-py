@@ -4,6 +4,7 @@ from redis import Redis
 from redis.asyncio import Redis as AsyncRedis
 
 from tair.tairbloom import TairBloomCommands
+from tair.taircpc import CpcUpdate2judResult, TairCpcCommands
 from tair.tairdoc import TairDocCommands
 from tair.tairgis import TairGisCommands
 from tair.tairhash import (
@@ -37,6 +38,7 @@ class TairCommands(
     TairGisCommands,
     TairDocCommands,
     TairTsCommands,
+    TairCpcCommands,
 ):
     pass
 
@@ -115,6 +117,21 @@ TAIR_RESPONSE_CALLBACKS = {
     "EXTS.S.RAW_MMODIFY": lambda resp: [bool_ok(i) for i in resp],
     "EXTS.S.RAW_INCRBY": bool_ok,
     "EXTS.S.RAW_MINCRBY": lambda resp: [bool_ok(i) for i in resp],
+    # TairCpc
+    "CPC.UPDATE": bool_ok,
+    "CPC.ESTIMATE": lambda resp: float(resp.decode()),
+    "CPC.UPDATE2EST": lambda resp: float(resp.decode()),
+    "CPC.UPDATE2JUD": lambda resp: CpcUpdate2judResult(
+        float(resp[0].decode()), float(resp[1].decode())
+    ),
+    "CPC.ARRAY.UPDATE": bool_ok,
+    "CPC.ARRAY.ESTIMATE": lambda resp: float(resp.decode()),
+    "CPC.ARRAY.ESTIMATE.RANGE": lambda resp: [float(i.decode()) for i in resp],
+    "CPC.ARRAY.ESTIMATE.RANGE.MERGE": lambda resp: float(resp.decode()),
+    "CPC.ARRAY.UPDATE2EST": lambda resp: float(resp.decode()),
+    "CPC.ARRAY.UPDATE2JUD": lambda resp: CpcUpdate2judResult(
+        float(resp[0].decode()), float(resp[1].decode())
+    ),
 }
 
 
