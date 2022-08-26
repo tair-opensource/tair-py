@@ -32,6 +32,8 @@ def test_from_url():
     assert result.value == value.encode()
     assert result.version == 1
 
+    t.close()
+
 
 def test_from_url_cluster():
     url = f"{TAIR_CLUSTER_SCHEME}://{TAIR_CLUSTER_HOST}:{TAIR_CLUSTER_PORT}"
@@ -46,6 +48,8 @@ def test_from_url_cluster():
     assert result.value == value.encode()
     assert result.version == 1
 
+    tc.close()
+
 
 @pytest.mark.asyncio
 async def test_from_url_async():
@@ -58,6 +62,8 @@ async def test_from_url_async():
     result: ExgetResult = await t.exget(key)
     assert result.value == value.encode()
     assert result.version == 1
+
+    await t.close()
 
 
 @pytest.mark.asyncio
@@ -73,3 +79,5 @@ async def test_from_url_async_cluster():
     result: ExgetResult = await tc.exget(key)
     assert result.value == value.encode()
     assert result.version == 1
+
+    await tc.close()
