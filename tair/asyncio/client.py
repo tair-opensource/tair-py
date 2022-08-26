@@ -1,7 +1,6 @@
 from typing import Mapping, Optional, Union
 
-from redis import ConnectionPool
-from redis.asyncio.client import Redis
+from redis.asyncio import ConnectionPool, Redis
 from redis.retry import Retry
 
 from tair.commands import TairCommands, set_tair_response_callback
