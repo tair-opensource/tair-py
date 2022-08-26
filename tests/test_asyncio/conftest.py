@@ -55,6 +55,13 @@ async def t() -> Union[Tair, TairCluster]:
     await tair.close()
 
 
+@pytest_asyncio.fixture()
+async def tc() -> TairCluster:
+    tair = await get_tair_cluster_client()
+    yield tair
+    await tair.close()
+
+
 async def get_server_time(client) -> datetime:
     seconds, milliseconds = await client.time()
     timestamp = float(f"{seconds}.{milliseconds}")

@@ -3,16 +3,14 @@ import uuid
 import pytest
 from redis.exceptions import RedisClusterException
 
-from tair import ExgetResult, Tair, TairCluster
+from tair import ExgetResult
+from tair.asyncio import Tair, TairCluster
 
 
 class TestPipeline:
-    def test_pipeline_is_true(self, t: Tair):
-        with t.pipeline() as pipe:
-            assert pipe
-
-    def test_pipeline(self, t: Tair):
-        with t.pipeline() as pipe:
+    @pytest.mark.asyncio
+    async def test_pipeline(self, t: Tair):
+        async with t.pipeline() as pipe:
             key1 = "key_" + str(uuid.uuid4())
             key2 = "key_" + str(uuid.uuid4())
             key3 = "key_" + str(uuid.uuid4())
@@ -28,7 +26,7 @@ class TestPipeline:
                 .exget(key2)
                 .exget(key3)
             )
-            assert pipe.execute() == [
+            assert await pipe.execute() == [
                 True,
                 True,
                 True,
@@ -37,8 +35,9 @@ class TestPipeline:
                 ExgetResult(value3.encode(), 1),
             ]
 
-    def test_pipeline_cluster(self, tc: TairCluster):
-        with tc.pipeline() as pipe:
+    @pytest.mark.asyncio
+    async def test_pipeline_cluster(self, tc: TairCluster):
+        async with tc.pipeline() as pipe:
             key1 = "key_" + str(uuid.uuid4())
             key2 = "key_" + str(uuid.uuid4())
             key3 = "key_" + str(uuid.uuid4())
@@ -54,7 +53,7 @@ class TestPipeline:
                 .exget(key2)
                 .exget(key3)
             )
-            assert pipe.execute() == [
+            assert await pipe.execute() == [
                 True,
                 True,
                 True,
@@ -63,7 +62,8 @@ class TestPipeline:
                 ExgetResult(value3.encode(), 1),
             ]
 
-    def test_deprecated(self, tc: TairCluster):
+    @pytest.mark.asyncio
+    async def test_deprecated(self, tc: TairCluster):
         with pytest.raises(RedisClusterException):
             tc.pipeline(transaction=True)
         with pytest.raises(RedisClusterException):
