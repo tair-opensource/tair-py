@@ -18,6 +18,10 @@ TAIR_CLUSTER_PORT = 30001
 TAIR_CLUSTER_USERNAME = None
 TAIR_CLUSTER_PASSWORD = None
 
+# redis or rediss
+TAIR_SCHEME = "redis"
+TAIR_CLUSTER_SCHEME = "redis"
+
 # due to network delay, ttl and pttl are not very accurate,
 # so we set a calibration value.
 # unit: millisecond
