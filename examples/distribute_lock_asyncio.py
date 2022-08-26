@@ -26,7 +26,6 @@ async def init():
         username=TAIR_USERNAME,
         password=TAIR_PASSWORD,
     )
-    await tair.initialize()
 
 
 LOCK_KEY: str = "LOCK_KEY"

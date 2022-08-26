@@ -32,7 +32,6 @@ async def get_tair_client() -> Tair:
         username=TAIR_USERNAME,
         password=TAIR_PASSWORD,
     )
-    await tair.initialize()
     return tair
 
 
@@ -43,7 +42,6 @@ async def get_tair_cluster_client() -> TairCluster:
         username=TAIR_CLUSERT_USERNAME,
         password=TAIR_CLUSERT_PASSWORD,
     )
-    await tair_cluster.initialize()
     return tair_cluster
 
 
