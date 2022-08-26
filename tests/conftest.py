@@ -13,10 +13,10 @@ TAIR_DB = 0
 TAIR_USERNAME = None
 TAIR_PASSWORD = None
 
-TAIR_CLUSERT_HOST = "localhost"
-TAIR_CLUSERT_PORT = 30001
-TAIR_CLUSERT_USERNAME = None
-TAIR_CLUSERT_PASSWORD = None
+TAIR_CLUSTER_HOST = "localhost"
+TAIR_CLUSTER_PORT = 30001
+TAIR_CLUSTER_USERNAME = None
+TAIR_CLUSTER_PASSWORD = None
 
 # due to network delay, ttl and pttl are not very accurate,
 # so we set a calibration value.
@@ -36,10 +36,10 @@ def get_tair_client() -> Tair:
 
 def get_tair_cluster_client() -> TairCluster:
     return TairCluster(
-        host=TAIR_CLUSERT_HOST,
-        port=TAIR_CLUSERT_PORT,
-        username=TAIR_CLUSERT_USERNAME,
-        password=TAIR_CLUSERT_PASSWORD,
+        host=TAIR_CLUSTER_HOST,
+        port=TAIR_CLUSTER_PORT,
+        username=TAIR_CLUSTER_USERNAME,
+        password=TAIR_CLUSTER_PASSWORD,
     )
 
 

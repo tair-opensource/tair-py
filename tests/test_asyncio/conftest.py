@@ -7,10 +7,10 @@ import pytest_asyncio
 from tair.asyncio import Tair, TairCluster
 
 from ..conftest import (
-    TAIR_CLUSERT_HOST,
-    TAIR_CLUSERT_PASSWORD,
-    TAIR_CLUSERT_PORT,
-    TAIR_CLUSERT_USERNAME,
+    TAIR_CLUSTER_HOST,
+    TAIR_CLUSTER_PASSWORD,
+    TAIR_CLUSTER_PORT,
+    TAIR_CLUSTER_USERNAME,
     TAIR_DB,
     TAIR_HOST,
     TAIR_PASSWORD,
@@ -37,10 +37,10 @@ async def get_tair_client() -> Tair:
 
 async def get_tair_cluster_client() -> TairCluster:
     tair_cluster = TairCluster(
-        host=TAIR_CLUSERT_HOST,
-        port=TAIR_CLUSERT_PORT,
-        username=TAIR_CLUSERT_USERNAME,
-        password=TAIR_CLUSERT_PASSWORD,
+        host=TAIR_CLUSTER_HOST,
+        port=TAIR_CLUSTER_PORT,
+        username=TAIR_CLUSTER_USERNAME,
+        password=TAIR_CLUSTER_PASSWORD,
     )
     return tair_cluster
 
