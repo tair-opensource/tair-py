@@ -3,8 +3,8 @@ from typing import Mapping, Optional, Union
 from redis.asyncio import ConnectionPool, Redis
 from redis.retry import Retry
 
+from tair.asyncio.pipeline import Pipeline
 from tair.commands import TairCommands, set_tair_response_callback
-from tair.pipeline import Pipeline
 
 
 class Tair(Redis, TairCommands):
