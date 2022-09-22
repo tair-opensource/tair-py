@@ -72,3 +72,12 @@ if __name__ == "__main__":
 ## 使用许可
 
 [MIT](LICENSE)
+
+# Tair 所有的 SDK
+
+| language | GitHub |
+|----------|---|
+| Java     |https://github.com/alibaba/alibabacloud-tairjedis-sdk|
+| Python   |https://github.com/alibaba/tair-py|
+| Go       |https://github.com/alibaba/tair-go|
+| .Net     |https://github.com/alibaba/AlibabaCloud.TairSDK|
