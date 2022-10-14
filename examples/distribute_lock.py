@@ -5,22 +5,9 @@ import uuid
 from threading import Thread
 from typing import List
 
-from tair import Tair, TairError
+from tair import TairError
 
-# change the following configuration for your Tair.
-TAIR_HOST = "localhost"
-TAIR_PORT = 6379
-TAIR_DB = 0
-TAIR_USERNAME = None
-TAIR_PASSWORD = None
-
-tair: Tair = Tair(
-    host=TAIR_HOST,
-    port=TAIR_PORT,
-    db=TAIR_DB,
-    username=TAIR_USERNAME,
-    password=TAIR_PASSWORD,
-)
+from conf_examples import get_tair
 
 LOCK_KEY: str = "LOCK_KEY"
 
@@ -35,6 +22,7 @@ class Account:
 # expire_time is to prevent the deadlock of business machine downtime
 def try_lock(key: str, request_id: str, expire_time: int) -> bool:
     try:
+        tair = get_tair()
         result = tair.set(key, request_id, ex=expire_time, nx=True)
         # if the command was successful, return True
         # else return None
@@ -48,6 +36,7 @@ def try_lock(key: str, request_id: str, expire_time: int) -> bool:
 # request_id ensures that the released lock is added by itself
 def release_lock(key: str, request_id: str) -> bool:
     try:
+        tair = get_tair()
         result = tair.cad(key, request_id)
         # if the key doesn't exist, return -1
         # if the request_id doesn't match, return 0

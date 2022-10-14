@@ -4,29 +4,16 @@ import time
 from threading import Thread
 from typing import List
 
-from tair import ResponseError, Tair
+from tair import ResponseError
 
-# change the following configuration for your Tair.
-TAIR_HOST = "localhost"
-TAIR_PORT = 6379
-TAIR_DB = 0
-TAIR_USERNAME = None
-TAIR_PASSWORD = None
-
-tair: Tair = Tair(
-    host=TAIR_HOST,
-    port=TAIR_PORT,
-    db=TAIR_DB,
-    username=TAIR_USERNAME,
-    password=TAIR_PASSWORD,
-)
-
+from conf_examples import get_tair
 
 KEY = "COMMODITY_QUANTITY"
 
 
 def init() -> bool:
     try:
+        tair = get_tair()
         tair.exset(KEY, "100")
         return True
     except Exception as e:
@@ -36,6 +23,7 @@ def init() -> bool:
 
 def purchase(user_id) -> bool:
     try:
+        tair = get_tair()
         ret = tair.exincrby(KEY, num=-1, minval=0)
         print(
             f"the user {user_id} has purchased an item, and currently there are {ret} left"
