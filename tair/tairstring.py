@@ -131,6 +131,7 @@ class TairStringCommands(CommandsProtocol):
         abs: Optional[int] = None,
         minval: Optional[int] = None,
         maxval: Optional[int] = None,
+        define: Optional[int] = None,
     ) -> ResponseT:
         pieces: List[EncodableT] = [key, num]
 
@@ -181,6 +182,10 @@ class TairStringCommands(CommandsProtocol):
         if maxval is not None:
             pieces.append("MAX")
             pieces.append(maxval)
+
+        if define is not None:
+            pieces.append("DEF")
+            pieces.append(define)
 
         return self.execute_command("EXINCRBY", *pieces)
 
