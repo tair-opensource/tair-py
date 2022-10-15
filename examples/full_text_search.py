@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from tair import ResponseError
-
 from conf_examples import get_tair
+
+from tair import ResponseError
 
 
 # create index, The field of index is parsed according to the field corresponding to the text

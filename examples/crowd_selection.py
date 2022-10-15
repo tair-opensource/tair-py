@@ -2,9 +2,9 @@
 
 from typing import List
 
-from tair import ResponseError
-
 from conf_examples import get_tair
+
+from tair import ResponseError
 
 
 # Set key offset value, value can be 0 or 1.

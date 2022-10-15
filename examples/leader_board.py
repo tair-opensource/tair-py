@@ -2,9 +2,9 @@
 
 from typing import Union
 
-from tair import ResponseError
-
 from conf_examples import get_tair
+
+from tair import ResponseError
 
 
 # Add User with Multi scores.

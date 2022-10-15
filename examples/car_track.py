@@ -2,9 +2,9 @@
 
 import time
 
-from tair import ResponseError
-
 from conf_examples import get_tair
+
+from tair import ResponseError
 
 
 # add longitude/latitude to key, timestamp represents the current moment.

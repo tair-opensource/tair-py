@@ -4,9 +4,9 @@ import time
 from threading import Thread
 from typing import List
 
-from tair import ResponseError
-
 from conf_examples import get_tair
+
+from tair import ResponseError
 
 KEY = "COMMODITY_QUANTITY"
 

@@ -2,9 +2,9 @@
 
 from typing import List
 
-from tair import ResponseError
-
 from conf_examples import get_tair
+
+from tair import ResponseError
 
 
 # Determine if the URL has been crawled

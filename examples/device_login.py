@@ -2,9 +2,9 @@
 
 import time
 
-from tair import ResponseError
-
 from conf_examples import get_tair
+
+from tair import ResponseError
 
 
 # Record the login time and device name of the device, and set the login status expiration time

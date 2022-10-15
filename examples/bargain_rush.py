@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-from tair import ResponseError
-
 from conf_examples import get_tair
+
+from tair import ResponseError
 
 
 # bargainRush decrements the value of key from upperBound by 1 until lowerBound

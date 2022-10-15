@@ -5,9 +5,9 @@ import uuid
 from threading import Thread
 from typing import List
 
-from tair import TairError
-
 from conf_examples import get_tair
+
+from tair import TairError
 
 LOCK_KEY: str = "LOCK_KEY"
 
