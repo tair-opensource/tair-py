@@ -2,6 +2,7 @@ from typing import Union
 
 from redis import Redis
 from redis.asyncio import Redis as AsyncRedis
+from redis.client import bool_ok, int_or_none
 
 from tair.tairbloom import TairBloomCommands
 from tair.taircpc import CpcUpdate2judResult, TairCpcCommands
@@ -26,6 +27,14 @@ from tair.tairstring import (
 )
 from tair.tairts import TairTsCommands
 from tair.tairzset import TairZsetCommands, parse_tair_zset_items
+from tair.tairvector import (
+    TairVectorCommands,
+    parse_tvs_get_index_result,
+    parse_tvs_get_result,
+    parse_tvs_search_result,
+    parse_tvs_msearch_result,
+    parse_tvs_hmget_result,
+)
 
 
 class TairCommands(
@@ -39,6 +48,7 @@ class TairCommands(
     TairDocCommands,
     TairTsCommands,
     TairCpcCommands,
+    TairVectorCommands,
 ):
     pass
 
@@ -132,6 +142,17 @@ TAIR_RESPONSE_CALLBACKS = {
     "CPC.ARRAY.UPDATE2JUD": lambda resp: CpcUpdate2judResult(
         float(resp[0].decode()), float(resp[1].decode())
     ),
+    # TairVector
+    "TVS.CREATEINDEX":bool_ok,
+    "TVS.GETINDEX": parse_tvs_get_index_result,
+    "TVS.DELINDEX": int_or_none,
+    "TVS.HSET": int_or_none,
+    "TVS.DEL": int_or_none,
+    "TVS.HDEL": int_or_none,
+    "TVS.HGETALL": parse_tvs_get_result,
+    "TVS.HMGET":parse_tvs_hmget_result,
+    "TVS.KNNSEARCH": parse_tvs_search_result,
+    "TVS.MKNNSEARCH": parse_tvs_msearch_result,
 }
 
 
