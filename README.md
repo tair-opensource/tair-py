@@ -20,6 +20,7 @@ tair-py is a Python client of [Tair](https://www.alibabacloud.com/help/en/apsara
 - [TairGis](https://www.alibabacloud.com/help/en/apsaradb-for-redis/latest/tairgis-commands), allowing you to query points, linestrings, and polygons. (Coming soon)
 - [TairTs](https://www.alibabacloud.com/help/en/apsaradb-for-redis/latest/tairts-commands), is a time series data structure that is developed on top of Redis modules.  (Coming soon)
 - [TairCpc](https://www.alibabacloud.com/help/en/apsaradb-for-redis/latest/taircpc-commands), is a data structure developed based on the compressed probability counting (CPC) sketch. (Coming soon)
+- [TairVector](https://www.alibabacloud.com/help/en/apsaradb-for-redis/latest/tairvector),  is a self-developed data structure that provides high-performance real-time storage and retrieval of vectors. (Coming soon)
 
 ## Install
 

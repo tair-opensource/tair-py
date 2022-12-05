@@ -20,6 +20,7 @@
 - [TairDoc](https://help.aliyun.com/document_detail/145940.html), 支持存储`JSON`类型。（待开源）
 - [TairTs](https://help.aliyun.com/document_detail/408954.html), 时序数据结构，提供低时延、高并发的内存读写访问。（待开源）
 - [TairCpc](https://help.aliyun.com/document_detail/410587.html), 基于CPC（Compressed Probability Counting）压缩算法开发的数据结构，支持仅占用很小的内存空间对采样数据进行高性能计算。（待开源）
+- [TairVector](https://help.aliyun.com/document_detail/457193.html),提供高性能、实时，集存储、检索于一体的向量数据库服务。（待开源）
 
 ## 安装
 

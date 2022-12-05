@@ -23,6 +23,7 @@ from tair.tairsearch import ScandocidResult
 from tair.tairstring import ExcasResult, ExgetResult
 from tair.tairts import Aggregation, TairTsSkeyItem
 from tair.tairzset import TairZsetItem
+from tair.tairvector import TairVectorScanResult, TairVectorIndex
 
 __all__ = [
     "Aggregation",
@@ -54,4 +55,6 @@ __all__ = [
     "TairError",
     "TimeoutError",
     "WatchError",
+    "TairVectorScanResult",
+    "TairVectorIndex",
 ]
