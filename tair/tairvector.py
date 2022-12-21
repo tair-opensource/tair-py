@@ -1,12 +1,13 @@
-from typing import Sequence, Tuple, Union,Iterable
-from tair.typing import ResponseT
-from typing import Dict, List, Tuple, Union
+from functools import partial, reduce
+from typing import Dict, Iterable, List, Sequence, Tuple, Union
+
 from redis.client import pairs_to_dict
 from redis.utils import str_if_bytes
-from typing import Sequence, Union
-from functools import partial, reduce
+
+from tair.typing import ResponseT
 
 VectorType = Sequence[Union[int, float]]
+
 
 class DistanceMetric:
     Euclidean = "L2"  # an alias to L2
@@ -14,16 +15,20 @@ class DistanceMetric:
     InnerProduct = "IP"
     Jaccard = "JACCARD"
 
+
 class IndexType:
     HNSW = "HNSW"
     FLAT = "FLAT"
 
+
 class Constants:
     VECTOR_KEY = "VECTOR"
+
 
 class DataType:
     Float32 = "FLOAT32"
     Binary = "BINARY"
+
 
 class TextVectorEncoder:
     SEP = bytes(",", "ascii")
@@ -49,6 +54,7 @@ class TextVectorEncoder:
         if is_int:
             return tuple(int(x) for x in components)
         return tuple(float(x) for x in components)
+
 
 class TairVectorScanResult:
     """
@@ -152,7 +158,7 @@ class TairVectorIndex:
         self, k: int, vectors: Sequence[VectorType], filter_str: str = None, **kwargs
     ):
         """batch approximate nearest neighbors search for a list of vectors"""
-        return self.client.tvs_knnsearch(
+        return self.client.tvs_mknnsearch(
             self.name, k, vectors, self.is_binary, filter_str, **kwargs
         )
 
@@ -164,7 +170,6 @@ class TairVectorIndex:
 
 
 class TairVectorCommands:
-
     encode_vector = TextVectorEncoder.encode
     decode_vector = TextVectorEncoder.decode
 
@@ -304,6 +309,8 @@ class TairVectorCommands:
 
     SEARCH_CMD = "TVS.KNNSEARCH"
     MSEARCH_CMD = "TVS.MKNNSEARCH"
+    MINDEXKNNSEARCH_CMD = "TVS.MINDEXKNNSEARCH"
+    MINDEXMKNNSEARCH_CMD = "TVS.MINDEXMKNNSEARCH"
 
     def tvs_knnsearch(
         self,
@@ -361,10 +368,72 @@ class TairVectorCommands:
             *params
         )
 
+    def tvs_mindexknnsearch(
+        self,
+        index: Sequence[str],
+        k: int,
+        vector: Union[VectorType, str],
+        is_binary: bool = False,
+        filter_str: str = None,
+        **kwargs
+    ):
+        """
+        search for the top @k approximate nearest neighbors of @vector in indexs
+        """
+        params = reduce(lambda x, y: x + y, kwargs.items(), ())
+        if not isinstance(vector, str):
+            vector = TairVectorCommands.encode_vector(vector, is_binary)
+        if filter_str is None:
+            return self.execute_command(
+                self.MINDEXKNNSEARCH_CMD, len(index), *index, k, vector, *params
+            )
+        return self.execute_command(
+            self.MINDEXKNNSEARCH_CMD, len(index), *index, k, vector, filter_str, *params
+        )
+
+    def tvs_mindexmknnsearch(
+        self,
+        index: Sequence[str],
+        k: int,
+        vectors: Sequence[VectorType],
+        is_binary: bool = False,
+        filter_str: str = None,
+        **kwargs
+    ):
+        """
+        batch approximate nearest neighbors search for a list of vectors
+        """
+        params = reduce(lambda x, y: x + y, kwargs.items(), ())
+        encoded_vectors = [
+            TairVectorCommands.encode_vector(x, is_binary) for x in vectors
+        ]
+        if filter_str is None:
+            return self.execute_command(
+                self.MINDEXMKNNSEARCH_CMD,
+                len(index),
+                *index,
+                k,
+                len(encoded_vectors),
+                *encoded_vectors,
+                *params
+            )
+        return self.execute_command(
+            self.MINDEXMKNNSEARCH_CMD,
+            len(index),
+            *index,
+            k,
+            len(encoded_vectors),
+            *encoded_vectors,
+            filter_str,
+            *params
+        )
+
+
 def parse_tvs_get_index_result(resp) -> Union[Dict, None]:
     if len(resp) == 0:
         return None
     return pairs_to_dict(resp, decode_keys=True, decode_string_values=True)
+
 
 def parse_tvs_get_result(resp) -> Dict:
     result = pairs_to_dict(resp, decode_keys=True, decode_string_values=False)
@@ -376,13 +445,16 @@ def parse_tvs_get_result(resp) -> Dict:
     values = map(str_if_bytes, result.values())
     return dict(zip(result.keys(), values))
 
+
 def parse_tvs_hmget_result(resp) -> tuple:
     if len(resp) == 0:
         return None
-    return ([resp[i].decode("ascii") if resp[i] else None for i in range(0, len(resp))])
+    return [resp[i].decode("ascii") if resp[i] else None for i in range(0, len(resp))]
+
 
 def parse_tvs_search_result(resp) -> List[Tuple]:
     return [(resp[i], float(resp[i + 1])) for i in range(0, len(resp), 2)]
+
 
 def parse_tvs_msearch_result(resp) -> List[List[Tuple]]:
     return [parse_tvs_search_result(r) for r in resp]
