@@ -26,15 +26,15 @@ from tair.tairstring import (
     parse_exset,
 )
 from tair.tairts import TairTsCommands
-from tair.tairzset import TairZsetCommands, parse_tair_zset_items
 from tair.tairvector import (
     TairVectorCommands,
     parse_tvs_get_index_result,
     parse_tvs_get_result,
-    parse_tvs_search_result,
-    parse_tvs_msearch_result,
     parse_tvs_hmget_result,
+    parse_tvs_msearch_result,
+    parse_tvs_search_result,
 )
+from tair.tairzset import TairZsetCommands, parse_tair_zset_items
 
 
 class TairCommands(
@@ -143,16 +143,18 @@ TAIR_RESPONSE_CALLBACKS = {
         float(resp[0].decode()), float(resp[1].decode())
     ),
     # TairVector
-    "TVS.CREATEINDEX":bool_ok,
+    "TVS.CREATEINDEX": bool_ok,
     "TVS.GETINDEX": parse_tvs_get_index_result,
     "TVS.DELINDEX": int_or_none,
     "TVS.HSET": int_or_none,
     "TVS.DEL": int_or_none,
     "TVS.HDEL": int_or_none,
     "TVS.HGETALL": parse_tvs_get_result,
-    "TVS.HMGET":parse_tvs_hmget_result,
+    "TVS.HMGET": parse_tvs_hmget_result,
     "TVS.KNNSEARCH": parse_tvs_search_result,
     "TVS.MKNNSEARCH": parse_tvs_msearch_result,
+    "TVS.MINDEXKNNSEARCH": parse_tvs_search_result,
+    "TVS.MINDEXMKNNSEARCH": parse_tvs_msearch_result,
 }
 
 

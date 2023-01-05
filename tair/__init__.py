@@ -22,8 +22,8 @@ from tair.tairroaring import TrScanResult
 from tair.tairsearch import ScandocidResult
 from tair.tairstring import ExcasResult, ExgetResult
 from tair.tairts import Aggregation, TairTsSkeyItem
+from tair.tairvector import TairVectorIndex, TairVectorScanResult
 from tair.tairzset import TairZsetItem
-from tair.tairvector import TairVectorScanResult, TairVectorIndex
 
 __all__ = [
     "Aggregation",

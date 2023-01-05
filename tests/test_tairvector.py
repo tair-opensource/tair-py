@@ -1,15 +1,23 @@
 # /user/bin/env python3
-import sys
 import os
+import string
+import sys
+import unittest
 import uuid
+from random import choice, randint, random
+
+import redis
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from random import random, randint, choice
-import unittest
-import redis
-import string
+from tair.tairvector import (
+    Constants,
+    DataType,
+    DistanceMetric,
+    TairVectorCommands,
+    TairVectorIndex,
+)
 
-from tair.tairvector import DataType, DistanceMetric, Constants, TairVectorIndex
 from .conftest import get_tair_client
 
 client = get_tair_client()
@@ -17,6 +25,7 @@ client = get_tair_client()
 dim = 16
 num_vectors = 100
 test_vectors = [[random() for _ in range(dim)] for _ in range(num_vectors)]
+test2_vectors = [[random() for _ in range(dim)] for _ in range(num_vectors)]
 num_attrs = 3
 attr_keys = ["key-%d" % i for i in range(num_attrs)]
 attr_values = [
@@ -24,7 +33,7 @@ attr_values = [
     for _ in range(num_vectors * num_attrs)
 ]
 test_attributes = [
-    dict(zip(attr_keys, attr_values[i: i + 3]))
+    dict(zip(attr_keys, attr_values[i : i + 3]))
     for i in range(0, num_vectors * num_attrs, num_attrs)
 ]
 
@@ -177,7 +186,9 @@ class DataCommandsTest(unittest.TestCase):
         value2 = "value_" + str(uuid.uuid4())
         ret = client.tvs_hset("test", key, vector=vector, field1=value1, field2=value2)
         self.assertTrue(ret)
-        obj = client.tvs_hmget("test", key, Constants.VECTOR_KEY, "field1", "field2", "field3")
+        obj = client.tvs_hmget(
+            "test", key, Constants.VECTOR_KEY, "field1", "field2", "field3"
+        )
         self.assertEqual(len(obj[0].split(",")), len(vector))
         self.assertEqual(obj[1], str(value1))
         self.assertEqual(obj[2], str(value2))
@@ -230,16 +241,21 @@ class SearchCommandsTest(unittest.TestCase):
         # delete test index
         try:
             client.tvs_del_index("test")
+            client.tvs_del_index("test2")
         except:
             pass
 
         ret = client.tvs_create_index("test", dim, **self.index_params)
+        ret = client.tvs_create_index("test2", dim, **self.index_params)
         if not ret:
-            raise RuntimeError("create test index failed")
+            raise RuntimeError("create test/test2 index failed")
 
     def test_1_insert_vectors(self):
         for i, v in enumerate(test_vectors):
             ret = client.tvs_hset("test", str(i).zfill(6), vector=v)
+            self.assertTrue(ret)
+        for i, v in enumerate(test2_vectors):
+            ret = client.tvs_hset("test2", str(i).zfill(6), vector=v)
             self.assertTrue(ret)
 
     def test_2_knn_search(self):
@@ -280,8 +296,30 @@ class SearchCommandsTest(unittest.TestCase):
     def test_6_msearch_with_filters(self):
         pass
 
+    def test_7_mindexknnsearch(self):
+        indexs = ["test", "test2"]
+        for q in queries:
+            result = client.tvs_mindexknnsearch(indexs, self.top_k, vector=q)
+            self.assertEqual(self.top_k, len(result))
+            d = 0.0
+            for k, v in result:
+                self.assertGreaterEqual(v, d)
+                d = v
+
+    def test_8_mindexmknnsearch(self):
+        indexs = ["test", "test2"]
+        batch = queries[:2]
+        result = client.tvs_mindexmknnsearch(indexs, self.top_k, batch)
+        self.assertEqual(len(result), len(batch))
+        for r in result:
+            d = 0.0
+            for _, v in r:
+                self.assertGreaterEqual(v, d)
+                d = v
+
     def test_9_delete_index(self):
         client.tvs_del_index("test")
+        client.tvs_del_index("test2")
 
 
 class IndexApiTest(unittest.TestCase):
