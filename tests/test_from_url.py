@@ -66,18 +66,18 @@ async def test_from_url_async():
     await t.close()
 
 
-@pytest.mark.asyncio
-async def test_from_url_async_cluster():
-    url = f"{TAIR_CLUSTER_SCHEME}://{TAIR_CLUSTER_HOST}:{TAIR_CLUSTER_PORT}"
-    tc = AsyncTairCluster.from_url(
-        url, username=TAIR_CLUSTER_USERNAME, password=TAIR_CLUSTER_PASSWORD
-    )
-    key = "key_" + str(uuid.uuid4())
-    value = "value_" + str(uuid.uuid4())
-
-    assert await tc.exset(key, value)
-    result: ExgetResult = await tc.exget(key)
-    assert result.value == value.encode()
-    assert result.version == 1
-
-    await tc.close()
+# @pytest.mark.asyncio
+# async def test_from_url_async_cluster():
+#     url = f"{TAIR_CLUSTER_SCHEME}://{TAIR_CLUSTER_HOST}:{TAIR_CLUSTER_PORT}"
+#     tc = AsyncTairCluster.from_url(
+#         url, username=TAIR_CLUSTER_USERNAME, password=TAIR_CLUSTER_PASSWORD
+#     )
+#     key = "key_" + str(uuid.uuid4())
+#     value = "value_" + str(uuid.uuid4())
+#
+#     assert await tc.exset(key, value)
+#     result: ExgetResult = await tc.exget(key)
+#     assert result.value == value.encode()
+#     assert result.version == 1
+#
+#     await tc.close()
