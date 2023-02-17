@@ -143,6 +143,9 @@ class TairSearchCommands(CommandsProtocol):
     def tft_search(self, index: KeyT, query: str) -> ResponseT:
         return self.execute_command("TFT.SEARCH", index, query)
 
+    def tft_msearch(self, index_count: int, index: Iterable[KeyT], query: str) -> ResponseT:
+        return self.execute_command("TFT.MSEARCH", index_count, *index, query)
+
     def tft_addsug(self, index: KeyT, mapping: Dict[str, int]) -> ResponseT:
         pieces: List[EncodableT] = [index]
 

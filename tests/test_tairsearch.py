@@ -374,6 +374,71 @@ class TestTairSearch:
         result = t.tft_search(index, '{"sort":[{"price":{"order":"desc"}}]}')
         assert json.loads(want) == json.loads(result)
 
+    def test_tft_msearch(self, t: Tair):
+        index1 = "idx_" + str(uuid.uuid4())
+        index2 = "idx_" + str(uuid.uuid4())
+        mappings = """
+{
+  "mappings": {
+    "_source": { "enabled": true },
+    "properties": {
+      "product_id": { "type": "keyword", "ignore_above": 128 },
+      "product_name": { "type": "text" },
+      "product_title": { "type": "text", "analyzer": "jieba" },
+      "price": { "type": "double" }
+    }
+  }
+}"""
+        document1 = '{"product_id":"test1"}'
+        document2 = '{"product_id":"test2"}'
+        document3 = '{"product_id":"test3"}'
+        document4 = '{"product_id":"test4"}'
+
+        assert t.tft_createindex(index1, mappings)
+        assert t.tft_createindex(index2, mappings)
+        assert t.tft_madddoc(
+            index1, {document1: "00001", document2: "00002"}
+        )
+        assert t.tft_madddoc(
+            index2, {document3: "00003", document4: "00004"}
+        )
+
+        want = f"""{{
+    "aux_info": {{"index_crc64": 5843875291690071373}},
+    "hits": {{
+        "hits": [
+          {{
+            "_id": "00001",
+            "_index": "{index1}",
+            "_score": 1.0,
+            "_source": {{ "product_id": "test1" }}
+          }},
+          {{
+            "_id": "00002",
+            "_index": "{index1}",
+            "_score": 1.0,
+            "_source": {{ "product_id": "test2" }}
+          }},
+          {{
+            "_id": "00003",
+            "_index": "{index2}",
+            "_score": 1.0,
+            "_source": {{ "product_id": "test3" }}
+          }},
+          {{
+            "_id": "00004",
+            "_index": "{index2}",
+            "_score": 1.0,
+            "_source": {{ "product_id": "test4" }}
+          }}
+        ],
+        "max_score": 1.0,
+        "total": {{ "relation": "eq", "value": 4 }}
+      }}
+    }}"""
+        result = t.tft_msearch(2, {index1, index2}, '{"sort":[{"price":{"order":"desc"}}]}')
+        assert json.loads(want) == json.loads(result)
+
     def test_tft_addsug(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
 
