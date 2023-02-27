@@ -27,11 +27,14 @@ class TairSearchCommands(CommandsProtocol):
     def tft_updateindex(self, index: KeyT, mappings: str) -> ResponseT:
         return self.execute_command("TFT.UPDATEINDEX", index, mappings)
 
-    def tft_getindex(self, index: KeyT, field: Optional[str] = None) -> ResponseT:
-        pieces: List[EncodableT] = [index]
-        if field is not None:
-            pieces.append(field)
-        return self.execute_command("TFT.GETINDEX", *pieces)
+    def tft_getindex(self, index: KeyT) -> ResponseT:
+        return self.execute_command("TFT.GETINDEX", index)
+
+    def tft_getindex_mappings(self, index: KeyT) -> ResponseT:
+        return self.execute_command("TFT.GETINDEX", index, "mappings")
+
+    def tft_getindex_settings(self, index: KeyT) -> ResponseT:
+        return self.execute_command("TFT.GETINDEX", index, "settings")
 
     def tft_adddoc(
         self,

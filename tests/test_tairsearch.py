@@ -120,7 +120,7 @@ class TestTairSearch:
   }}
 }}
 """
-        result = t.tft_getindex(index,"mappings")
+        result = t.tft_getindex_mappings(index)
         assert json.loads(mappings1) == json.loads(result)
         settings = f"""
 {{
@@ -130,7 +130,7 @@ class TestTairSearch:
   }}
 }}
 """
-        result = t.tft_getindex(index,"settings")
+        result = t.tft_getindex_settings(index)
         assert json.loads(settings) == json.loads(result)
         t.delete(index)
 
