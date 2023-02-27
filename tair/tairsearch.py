@@ -30,6 +30,12 @@ class TairSearchCommands(CommandsProtocol):
     def tft_getindex(self, index: KeyT) -> ResponseT:
         return self.execute_command("TFT.GETINDEX", index)
 
+    def tft_getindex_mappings(self, index: KeyT) -> ResponseT:
+        return self.execute_command("TFT.GETINDEX", index, "mappings")
+
+    def tft_getindex_settings(self, index: KeyT) -> ResponseT:
+        return self.execute_command("TFT.GETINDEX", index, "settings")
+
     def tft_adddoc(
         self,
         index: KeyT,
@@ -134,14 +140,17 @@ class TairSearchCommands(CommandsProtocol):
 
         return self.execute_command("TFT.SCANDOCID", *pieces)
 
-    def tft_deldoc(self, index: KeyT, doc_id: str, fields: Iterable[str]) -> ResponseT:
-        return self.execute_command("TFT.DELDOC", index, doc_id, *fields)
+    def tft_deldoc(self, index: KeyT, doc_id: Iterable[str]) -> ResponseT:
+        return self.execute_command("TFT.DELDOC", index, *doc_id, )
 
     def tft_delall(self, index: KeyT) -> ResponseT:
         return self.execute_command("TFT.DELALL", index)
 
-    def tft_search(self, index: KeyT, query: str) -> ResponseT:
-        return self.execute_command("TFT.SEARCH", index, query)
+    def tft_search(self, index: KeyT, query: str, use_cache: bool = False) -> ResponseT:
+        pieces: List[EncodableT] = [index, query]
+        if use_cache:
+            pieces.append("use_cache")
+        return self.execute_command("TFT.SEARCH", *pieces)
 
     def tft_msearch(self, index_count: int, index: Iterable[KeyT], query: str) -> ResponseT:
         return self.execute_command("TFT.MSEARCH", index_count, *index, query)

@@ -23,6 +23,7 @@ class TestTairSearch:
 }"""
 
         assert t.tft_createindex(index, mappings)
+        t.delete(index)
 
     def test_tft_updateindex(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -47,6 +48,8 @@ class TestTairSearch:
 
         assert t.tft_createindex(index, mappings1)
         assert t.tft_updateindex(index, mappings2)
+        t.delete(index)
+
 
     def test_tft_getindex(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -66,6 +69,70 @@ class TestTairSearch:
         assert t.tft_getindex(index) is None
         assert t.tft_createindex(index, mappings)
         assert t.tft_getindex(index) is not None
+        mappings1 = f"""
+{{
+  "{index}":{{
+    "mappings":{{
+      "_source":{{
+        "enabled":true,
+        "excludes":[
+        ],
+        "includes":[
+        ]
+      }},
+      "dynamic":"false",
+      "properties":{{
+        "price":{{
+          "boost":1.0,
+          "enabled":true,
+          "ignore_above":-1,
+          "index":true,
+          "similarity":"classic",
+          "type":"double"
+        }},
+        "product_id":{{
+          "boost":1.0,
+          "enabled":true,
+          "ignore_above":128,
+          "index":true,
+          "similarity":"classic",
+          "type":"keyword"
+        }},
+        "product_name":{{
+          "boost":1.0,
+          "enabled":true,
+          "ignore_above":-1,
+          "index":true,
+          "similarity":"classic",
+          "type":"text"
+        }},
+        "product_title":{{
+          "analyzer":"jieba",
+          "boost":1.0,
+          "enabled":true,
+          "ignore_above":-1,
+          "index":true,
+          "similarity":"classic",
+          "type":"text"
+        }}
+      }}
+    }}
+  }}
+}}
+"""
+        result = t.tft_getindex_mappings(index)
+        assert json.loads(mappings1) == json.loads(result)
+        settings = f"""
+{{
+  "{index}":{{
+    "settings":{{
+    }}
+  }}
+}}
+"""
+        result = t.tft_getindex_settings(index)
+        assert json.loads(settings) == json.loads(result)
+        t.delete(index)
 
     def test_tft_adddoc(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -86,6 +153,7 @@ class TestTairSearch:
         assert t.tft_createindex(index, mappings)
         assert t.tft_adddoc(index, document, doc_id="00001") == '{"_id":"00001"}'
         assert t.tft_adddoc(index, document)
+        t.delete(index)
 
     def test_tft_madddoc(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -106,6 +174,7 @@ class TestTairSearch:
 
         assert t.tft_createindex(index, mappings)
         assert t.tft_madddoc(index, {document1: "00001", document2: "00002"})
+        t.delete(index)
 
     def test_tft_updatedocfield(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -127,6 +196,7 @@ class TestTairSearch:
         assert t.tft_createindex(index, mappings)
         assert t.tft_adddoc(index, document1, doc_id="00001") == '{"_id":"00001"}'
         assert t.tft_updatedocfield(index, "00001", document2)
+        t.delete(index)
 
     def test_tft_deldocfield(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -147,6 +217,7 @@ class TestTairSearch:
         assert t.tft_createindex(index, mappings)
         assert t.tft_adddoc(index, document, doc_id="00001") == '{"_id":"00001"}'
         assert t.tft_deldocfield(index, "00001", ["product_name"]) == 1
+        t.delete(index)
 
     def test_tft_incrlongdocfield(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -167,6 +238,7 @@ class TestTairSearch:
         assert t.tft_createindex(index, mappings)
         assert t.tft_adddoc(index, document, doc_id="00001") == '{"_id":"00001"}'
         assert t.tft_incrlongdocfield(index, "00001", "price", 200) == 300
+        t.delete(index)
 
     def test_tft_incrfloatdocfield(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -189,6 +261,7 @@ class TestTairSearch:
         assert t.tft_incrfloatdocfield(index, "00001", "price", 2.2) == pytest.approx(
             3.3
         )
+        t.delete(index)
 
     def test_tft_getdoc(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -213,6 +286,7 @@ class TestTairSearch:
             t.tft_getdoc(index, "00001")
             == '{"_id":"00001","_source":{"product_id":"test1","price":1.1}}'
         )
+        t.delete(index)
 
     def test_tft_exists(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -234,6 +308,7 @@ class TestTairSearch:
         assert t.tft_adddoc(index, document, doc_id="00001") == '{"_id":"00001"}'
         assert t.tft_exists(index, "00001") == 1
         assert t.tft_exists(index, "00002") == 0
+        t.delete(index)
 
     def test_tft_docnum(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -255,6 +330,7 @@ class TestTairSearch:
         assert t.tft_createindex(index, mappings)
         assert t.tft_madddoc(index, {document1: "00001", document2: "00002"})
         assert t.tft_docnum(index) == 2
+        t.delete(index)
 
     def test_tft_scandocid(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -281,6 +357,7 @@ class TestTairSearch:
         assert t.tft_scandocid(index, 0, count=3, match="*") == ScandocidResult(
             "0", ["00001", "00002", "00003"]
         )
+        t.delete(index)
 
     def test_tft_deldoc(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -300,7 +377,8 @@ class TestTairSearch:
 
         assert t.tft_createindex(index, mappings)
         assert t.tft_adddoc(index, document, doc_id="00001") == '{"_id":"00001"}'
-        assert t.tft_deldoc(index, "00001", "00002") == 1
+        assert t.tft_deldoc(index, {"00001", "00002"}) == 1
+        t.delete(index)
 
     def test_tft_delall(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -321,6 +399,7 @@ class TestTairSearch:
         assert t.tft_createindex(index, mappings)
         assert t.tft_adddoc(index, document, doc_id="00001") == '{"_id":"00001"}'
         assert t.tft_delall(index)
+        t.delete(index)
 
     def test_tft_search(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -373,6 +452,9 @@ class TestTairSearch:
 }}"""
         result = t.tft_search(index, '{"sort":[{"price":{"order":"desc"}}]}')
         assert json.loads(want) == json.loads(result)
+        result = t.tft_search(index, '{"sort":[{"price":{"order":"desc"}}]}', True)
+        assert json.loads(want) == json.loads(result)
+        t.delete(index)
 
     def test_tft_msearch(self, t: Tair):
         index1 = "idx_" + str(uuid.uuid4())
@@ -436,8 +518,10 @@ class TestTairSearch:
         "total": {{ "relation": "eq", "value": 4 }}
       }}
     }}"""
-        result = t.tft_msearch(2, {index1, index2}, '{"sort":[{"price":{"order":"desc"}}]}')
+        result = t.tft_msearch(2, {index1, index2}, '{"sort":[{"_doc":{"order":"asc"}}]}')
         assert json.loads(want) == json.loads(result)
+        t.delete(index1)
+        t.delete(index2)
 
     def test_tft_addsug(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -446,6 +530,7 @@ class TestTairSearch:
             t.tft_addsug(index, {"redis is a memory database": 3, "redis cluster": 10})
             == 2
         )
+        t.delete(index)
 
     def test_tft_delsug(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -455,6 +540,7 @@ class TestTairSearch:
             == 2
         )
         assert t.tft_delsug(index, ("redis is a memory database", "redis cluster")) == 2
+        t.delete(index)
 
     def test_tft_sugnum(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -464,6 +550,7 @@ class TestTairSearch:
             == 2
         )
         assert t.tft_sugnum(index) == 2
+        t.delete(index)
 
     def test_tft_getsug(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -476,6 +563,7 @@ class TestTairSearch:
             "redis cluster",
             "redis is a memory database",
         ]
+        t.delete(index)
 
     def test_tft_getallsugs(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
@@ -488,6 +576,7 @@ class TestTairSearch:
             "redis cluster",
             "redis is a memory database",
         ]
+        t.delete(index)
 
     def test_scandocid_result_eq(self):
         assert ScandocidResult("0", ["00001", "00002", "00003"]) == ScandocidResult(
