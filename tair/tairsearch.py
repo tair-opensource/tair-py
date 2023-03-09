@@ -1,5 +1,6 @@
 from typing import Dict, Iterable, List, Optional
 
+import tair
 from tair.typing import CommandsProtocol, EncodableT, KeyT, ResponseT
 
 
@@ -141,7 +142,7 @@ class TairSearchCommands(CommandsProtocol):
         return self.execute_command("TFT.SCANDOCID", *pieces)
 
     def tft_deldoc(self, index: KeyT, doc_id: Iterable[str]) -> ResponseT:
-        return self.execute_command("TFT.DELDOC", index, *doc_id, )
+        return self.execute_command("TFT.DELDOC", index, *doc_id)
 
     def tft_delall(self, index: KeyT) -> ResponseT:
         return self.execute_command("TFT.DELALL", index)
@@ -154,6 +155,22 @@ class TairSearchCommands(CommandsProtocol):
 
     def tft_msearch(self, index_count: int, index: Iterable[KeyT], query: str) -> ResponseT:
         return self.execute_command("TFT.MSEARCH", index_count, *index, query)
+
+    def tft_analyzer(self, analyzer_name: str, text: str, index: Optional[KeyT] = None,
+                     show_time: Optional[bool] = False) -> ResponseT:
+        pieces: List[EncodableT] = [analyzer_name, text]
+        if index is not None:
+            pieces.append("INDEX")
+            pieces.append(index)
+        if show_time:
+            pieces.append("show_time")
+        if isinstance(self, tair.TairCluster):
+            if index is None:
+                return self.execute_command("TFT.ANALYZER", *pieces, target_nodes='random')
+            slot = self.keyslot(index)
+            node = self.nodes_manager.get_node_from_slot(slot)
+            return self.execute_command("TFT.ANALYZER", *pieces, target_nodes=node)
+        return self.execute_command("TFT.ANALYZER", *pieces)
 
     def tft_addsug(self, index: KeyT, mapping: Dict[str, int]) -> ResponseT:
         pieces: List[EncodableT] = [index]
