@@ -457,8 +457,8 @@ class TestTairSearch:
         t.delete(index)
 
     def test_tft_msearch(self, t: Tair):
-        index1 = "idx_" + str(uuid.uuid4())
-        index2 = "idx_" + str(uuid.uuid4())
+        index1 = "{idx}_" + str(uuid.uuid4())
+        index2 = "{idx}_" + str(uuid.uuid4())
         mappings = """
 {
   "mappings": {
@@ -522,6 +522,36 @@ class TestTairSearch:
         assert json.loads(want) == json.loads(result)
         t.delete(index1)
         t.delete(index2)
+
+    def test_tft_analyzer(self, t: Tair):
+        index = "idx_" + str(uuid.uuid4())
+        mappings = """
+{
+  "mappings":{
+    "properties":{
+      "f0":{
+        "type":"text",
+        "analyzer":"my_analyzer"
+      }
+    }
+  },
+  "settings":{
+    "analysis":{
+      "analyzer":{
+        "my_analyzer":{
+          "type":"standard"
+        }
+      }
+    }
+  }
+}"""
+        text = 'This is tair-py.'
+
+        assert t.tft_createindex(index, mappings)
+        assert t.tft_analyzer("standard", text) == t.tft_analyzer("my_analyzer", text, index)
+        assert 'consuming time' in str(t.tft_analyzer("standard", text, None, True))
+
+        t.delete(index)
 
     def test_tft_addsug(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())

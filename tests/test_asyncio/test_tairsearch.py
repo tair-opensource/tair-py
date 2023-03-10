@@ -314,7 +314,7 @@ class TestTairSearch:
 
         assert await t.tft_createindex(index, mappings)
         assert await t.tft_adddoc(index, document, doc_id="00001") == '{"_id":"00001"}'
-        assert await t.tft_deldoc(index, "00001", "00002") == 1
+        assert await t.tft_deldoc(index, {"00001", "00002"}) == 1
 
     @pytest.mark.asyncio
     async def test_tft_delall(self, t: Tair):
