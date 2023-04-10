@@ -172,6 +172,10 @@ class TairSearchCommands(CommandsProtocol):
                 target_nodes = self.nodes_manager.get_node_from_slot(self.keyslot(index))
         return self.execute_command("TFT.ANALYZER", *pieces, target_nodes=target_nodes)
 
+    def tft_explaincost(self, index: KeyT, query: str) -> ResponseT:
+        pieces: List[EncodableT] = [index, query]
+        return self.execute_command("TFT.EXPLAINCOST", *pieces)
+
     def tft_addsug(self, index: KeyT, mapping: Dict[str, int]) -> ResponseT:
         pieces: List[EncodableT] = [index]
 

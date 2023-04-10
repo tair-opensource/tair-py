@@ -454,6 +454,8 @@ class TestTairSearch:
         assert json.loads(want) == json.loads(result)
         result = t.tft_search(index, '{"sort":[{"price":{"order":"desc"}}]}', True)
         assert json.loads(want) == json.loads(result)
+        result = t.tft_explaincost(index, '{"sort":[{"price":{"order":"desc"}}]}')
+        assert json.loads(result)['QUERY_COST']
         t.delete(index)
 
     def test_tft_msearch(self, t: Tair):
