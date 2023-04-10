@@ -13,5 +13,5 @@ setup(
     author_email="vincillau@outlook.com",
     python_requires=">=3.7",
     packages=["tair", "tair.asyncio"],
-    install_requires=["redis >= 4.2"],
+    install_requires=["redis >= 4.4.4"],
 )
