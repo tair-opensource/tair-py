@@ -1,10 +1,9 @@
 from functools import partial, reduce
-from typing import Dict, Iterable, List, Sequence, Tuple, Union
+from typing import Dict, List, Sequence, Tuple, Union, Optional
 
 from redis.client import pairs_to_dict
 from redis.utils import str_if_bytes
 
-from tair.typing import ResponseT
 
 VectorType = Sequence[Union[int, float]]
 
@@ -34,19 +33,21 @@ class TextVectorEncoder:
     SEP = bytes(",", "ascii")
     BITS = ("0", "1")
 
-    def encode(vector: Sequence[Union[float, int]], is_binary=False) -> bytes:
+    @classmethod
+    def encode(cls, vector: VectorType, is_binary=False) -> bytes:
         s = ""
         if is_binary:
-            s = "[" + ",".join([TextVectorEncoder.BITS[x] for x in vector]) + "]"
+            s = "[" + ",".join([cls.BITS[x] for x in vector]) + "]"
         else:
             s = "[" + ",".join(["%f" % x for x in vector]) + "]"
         return bytes(s, encoding="ascii")  # ascii is enough
 
-    def decode(buf: bytes) -> Tuple[float]:
+    @classmethod
+    def decode(cls, buf: bytes) -> Tuple[float]:
         if buf[0] != ord("[") or buf[-1] != ord("]"):
             raise ValueError("invalid text vector value")
         is_int = True
-        components = buf[1:-1].split(TextVectorEncoder.SEP)
+        components = buf[1:-1].split(cls.SEP)
         for x in components:
             if not x.isdigit():
                 is_int = False
@@ -91,7 +92,7 @@ class TairVectorScanResult:
             raise StopIteration
         ret = self.batch[self.idx]
         self.idx += 1
-        return ret.decode("utf-8")
+        return ret
 
     def iter(self):
         """
@@ -138,7 +139,7 @@ class TairVectorIndex:
             raise ValueError("index not exist")
         return self.params
 
-    def tvs_hset(self, key: str, vector: Union[VectorType, str] = None, **kwargs):
+    def tvs_hset(self, key: str, vector: Union[VectorType, str, None] = None, **kwargs):
         """add/update a data entry to index
         @key: key for the data entry
         @vector: optional, vector value of the data entry
@@ -147,7 +148,11 @@ class TairVectorIndex:
         return self.client.tvs_hset(self.name, key, vector, self.is_binary, **kwargs)
 
     def tvs_knnsearch(
-        self, k: int, vector: Union[VectorType, str], filter_str: str = None, **kwargs
+        self,
+        k: int,
+        vector: Union[VectorType, str],
+        filter_str: Optional[str] = None,
+        **kwargs
     ):
         """search for the top @k approximate nearest neighbors of @vector"""
         return self.client.tvs_knnsearch(
@@ -155,7 +160,11 @@ class TairVectorIndex:
         )
 
     def tvs_mknnsearch(
-        self, k: int, vectors: Sequence[VectorType], filter_str: str = None, **kwargs
+        self,
+        k: int,
+        vectors: Sequence[VectorType],
+        filter_str: Optional[str] = None,
+        **kwargs
     ):
         """batch approximate nearest neighbors search for a list of vectors"""
         return self.client.tvs_mknnsearch(
@@ -220,13 +229,15 @@ class TairVectorCommands:
         return self.execute_command(self.DEL_INDEX_CMD, name)
 
     def tvs_scan_index(
-        self, pattern: str = None, batch: int = 10
+        self, pattern: Optional[str] = None, batch: int = 10
     ) -> TairVectorScanResult:
         """
         scan all the indices
         """
         args = ([] if pattern is None else ["MATCH", pattern]) + ["COUNT", batch]
-        get_batch = lambda c: self.execute_command(self.SCAN_INDEX_CMD, c, *args)
+
+        def get_batch(c):
+            return self.execute_command(self.SCAN_INDEX_CMD, c, *args)
 
         return TairVectorScanResult(self, get_batch)
 
@@ -247,7 +258,7 @@ class TairVectorCommands:
         self,
         index: str,
         key: str,
-        vector: Union[VectorType, str] = None,
+        vector: Union[VectorType, str, None] = None,
         is_binary=False,
         **kwargs
     ):
@@ -298,12 +309,14 @@ class TairVectorCommands:
     # def tvs_hmget(self, index: str, key: str,fields: Iterable[str]):
     #     return self.execute_command(self.HMGET_CMD, index,key, *fields)
 
-    def tvs_scan(self, index: str, pattern: str = None, batch: int = 10):
+    def tvs_scan(self, index: str, pattern: Optional[str] = None, batch: int = 10):
         """
         scan all data entries in an index
         """
         args = ([] if pattern is None else ["MATCH", pattern]) + ["COUNT", batch]
-        get_batch = lambda c: self.execute_command(self.SCAN_CMD, index, c, *args)
+
+        def get_batch(c):
+            return self.execute_command(self.SCAN_CMD, index, c, *args)
 
         return TairVectorScanResult(self, get_batch)
 
@@ -318,7 +331,7 @@ class TairVectorCommands:
         k: int,
         vector: Union[VectorType, str],
         is_binary: bool = False,
-        filter_str: str = None,
+        filter_str: Optional[str] = None,
         **kwargs
     ):
         """
@@ -339,7 +352,7 @@ class TairVectorCommands:
         k: int,
         vectors: Sequence[VectorType],
         is_binary: bool = False,
-        filter_str: str = None,
+        filter_str: Optional[str] = None,
         **kwargs
     ):
         """
@@ -374,7 +387,7 @@ class TairVectorCommands:
         k: int,
         vector: Union[VectorType, str],
         is_binary: bool = False,
-        filter_str: str = None,
+        filter_str: Optional[str] = None,
         **kwargs
     ):
         """
@@ -397,7 +410,7 @@ class TairVectorCommands:
         k: int,
         vectors: Sequence[VectorType],
         is_binary: bool = False,
-        filter_str: str = None,
+        filter_str: Optional[str] = None,
         **kwargs
     ):
         """
@@ -446,10 +459,10 @@ def parse_tvs_get_result(resp) -> Dict:
     return dict(zip(result.keys(), values))
 
 
-def parse_tvs_hmget_result(resp) -> tuple:
+def parse_tvs_hmget_result(resp) -> Optional[Tuple]:
     if len(resp) == 0:
         return None
-    return [resp[i].decode("ascii") if resp[i] else None for i in range(0, len(resp))]
+    return resp
 
 
 def parse_tvs_search_result(resp) -> List[Tuple]:

@@ -98,7 +98,7 @@ class IndexCommandsTest(unittest.TestCase):
         indices = []
         result = client.tvs_scan_index()
         for index in result.iter():
-            indices.append(index)
+            indices.append(index.decode())
         self.assertListEqual(indices, ["test"])
 
     def test_7_scan_index_with_pattern(self):
@@ -189,15 +189,15 @@ class DataCommandsTest(unittest.TestCase):
         obj = client.tvs_hmget(
             "test", key, Constants.VECTOR_KEY, "field1", "field2", "field3"
         )
-        self.assertEqual(len(obj[0].split(",")), len(vector))
-        self.assertEqual(obj[1], str(value1))
-        self.assertEqual(obj[2], str(value2))
+        self.assertEqual(len(obj[0].split(b",")), len(vector))
+        self.assertEqual(obj[1], bytes(value1, encoding="ascii"))
+        self.assertEqual(obj[2], bytes(value2, encoding="ascii"))
 
     def test_4_scan(self):
         result = client.tvs_scan("test")
         scanned_keys = []
         for k in result.iter():
-            scanned_keys.append(k)
+            scanned_keys.append(k.decode())
         expected_keys = [str(i) for i in range(len(test_vectors))]
         self.assertSetEqual(set(scanned_keys), set(expected_keys))
 
@@ -212,7 +212,7 @@ class DataCommandsTest(unittest.TestCase):
         scanned_keys = []
         for k in result.iter():
             scanned_keys.append(k)
-        self.assertEqual(scanned_keys, ["0"])
+        self.assertEqual(scanned_keys, [b"0"])
 
     def test_6_hdel(self):
         for i, attr in enumerate(test_attributes):
@@ -367,7 +367,7 @@ class IndexApiTest(unittest.TestCase):
         result = index.tvs_scan()
         scanned_keys = []
         for k in result.iter():
-            scanned_keys.append(k)
+            scanned_keys.append(k.decode())
         expected_keys = [str(i) for i in range(len(test_vectors))]
         self.assertSetEqual(set(scanned_keys), set(expected_keys))
 
