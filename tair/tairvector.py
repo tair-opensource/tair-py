@@ -13,6 +13,7 @@ class DistanceMetric:
     L2 = "L2"
     InnerProduct = "IP"
     Jaccard = "JACCARD"
+    Cosine = "COSINE"
 
 
 class IndexType:
@@ -309,11 +310,31 @@ class TairVectorCommands:
     # def tvs_hmget(self, index: str, key: str,fields: Iterable[str]):
     #     return self.execute_command(self.HMGET_CMD, index,key, *fields)
 
-    def tvs_scan(self, index: str, pattern: Optional[str] = None, batch: int = 10):
+    def tvs_scan(
+        self,
+        index: str,
+        pattern: Optional[str] = None,
+        batch: int = 10,
+        filter_str: Optional[str] = None,
+        vector: Optional[VectorType] = None,
+        max_dist: Optional[float] = None,
+    ):
         """
         scan all data entries in an index
         """
         args = ([] if pattern is None else ["MATCH", pattern]) + ["COUNT", batch]
+        if filter_str is not None:
+            args.append("FILTER")
+            args.append(filter_str)
+        if vector is not None and max_dist is not None:
+            args.append("VECTOR")
+            args.append(self.encode_vector(vector))
+            args.append("MAX_DIST")
+            args.append(max_dist)
+        elif vector is None and max_dist is None:
+            pass
+        else:
+            raise ValueError("missing vector or max_dist")
 
         def get_batch(c):
             return self.execute_command(self.SCAN_CMD, index, c, *args)

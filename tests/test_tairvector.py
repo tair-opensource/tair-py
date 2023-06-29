@@ -54,7 +54,6 @@ class IndexCommandsTest(unittest.TestCase):
         for index in result.iter():
             indices.append(index)
 
-        print("deleting indices:", indices)
         # deleting all indices
         for index in indices:
             try:
@@ -71,9 +70,6 @@ class IndexCommandsTest(unittest.TestCase):
         self.assertEqual(indices, [])
 
     def test_1_delete_noexist_index(self):
-        print(
-            "deleting no-exist index",
-        )
         ret = client.tvs_del_index("test")
         self.assertFalse(ret, 0)
 
@@ -289,13 +285,6 @@ class SearchCommandsTest(unittest.TestCase):
                 self.assertGreaterEqual(v, d)
                 d = v
 
-    # todo
-    def test_5_search_with_filters(self):
-        pass
-
-    def test_6_msearch_with_filters(self):
-        pass
-
     def test_7_mindexknnsearch(self):
         indexs = ["test", "test2"]
         for q in queries:
@@ -340,7 +329,6 @@ class IndexApiTest(unittest.TestCase):
         # create a new index
         index = TairVectorIndex(client, "test", dim=dim, **self.index_params)
         self.assertIsNotNone(index)
-        print(index)
 
         # get an existing index
         index2 = TairVectorIndex(client, "test")
@@ -482,6 +470,161 @@ class BinaryIndexTest(unittest.TestCase):
 
     def test_9_cleanup(self):
         ret = client.tvs_del_index("test_bin")
+        self.assertEqual(ret, 1)
+
+
+filter_test_data = [
+    {"vector": "[7,3]", "name": "Aaron", "age": "12"},  # dist 58
+    {"vector": "[9,2]", "name": "Bob", "age": "33"},  # dist 85
+    {"vector": "[6,6]", "name": "Charlie", "age": "29"},  # dist 72
+    {"vector": "[3,5]", "name": "Daniel", "age": "23"},  # dist 34
+    {"vector": "[3,7]", "name": "Eason", "age": "22"},  # dist 58
+    {"vector": "[3,6]", "name": "Fabian", "age": "35"},  # dist 45
+    {"vector": "[5,2]", "name": "George", "age": "12"},  # dist 29
+    {"vector": "[8,9]", "name": "Henry", "age": "30"},  # dist 145
+    {"vector": "[5,5]", "name": "Ivan", "age": "16"},  # dist 50
+    {"vector": "[2,7]", "name": "James", "age": "12"},  # dist 53
+]
+
+
+class ScanTest(unittest.TestCase):
+    index_name = "scan_test"
+
+    def test_0_create(self):
+        ret = client.tvs_create_index(
+            self.index_name,
+            2,
+            distance_type=DistanceMetric.L2,
+        )
+        self.assertTrue(ret)
+        for i, d in enumerate(filter_test_data):
+            ret = client.tvs_hset(self.index_name, str(i), **d)
+            self.assertEqual(ret, 3)
+
+    def test_1_basic_scan(self):
+        result = [r for r in client.tvs_scan(self.index_name, "*")]
+        result = sorted(result)
+        self.assertListEqual(result, [str(i).encode() for i in range(0, 10)])
+
+        result = [r for r in client.tvs_scan(self.index_name, "a*")]
+        self.assertEqual(len(result), 0)
+
+    def test_2_scan_with_filter(self):
+        result = [r for r in client.tvs_scan(self.index_name, filter_str="age>30")]
+        result = sorted(result)
+        self.assertListEqual(result, [b"1", b"5"])
+
+        result = [r for r in client.tvs_scan(self.index_name, filter_str='name>"H"')]
+        result = sorted(result)
+        self.assertListEqual(result, [b"7", b"8", b"9"])
+
+        result = [
+            r for r in client.tvs_scan(self.index_name, filter_str='name=="Henry"')
+        ]
+        self.assertListEqual(result, [b"7"])
+
+    def test_3_scan_with_max_distance(self):
+        with self.assertRaises(ValueError):
+            client.tvs_scan(self.index_name, max_dist=50)
+        with self.assertRaises(ValueError):
+            client.tvs_scan(self.index_name, vector=[0, 0])
+        result = [
+            r for r in client.tvs_scan(self.index_name, vector=[0, 0], max_dist=50)
+        ]
+        result = sorted(result)
+        self.assertListEqual(result, [b"3", b"5", b"6"])
+
+    def test_4_scan_with_both(self):
+        result = [
+            r
+            for r in client.tvs_scan(
+                self.index_name, vector=[0, 0], max_dist=50, filter_str="age<30"
+            )
+        ]
+        result = sorted(result)
+        self.assertListEqual(result, [b"3", b"6"])
+
+    def test_9_cleanup(self):
+        ret = client.tvs_del_index(self.index_name)
+        self.assertEqual(ret, 1)
+
+
+class SearchWithFilterTest(unittest.TestCase):
+    index_name = "filter_test"
+
+    def test_0_create(self):
+        ret = client.tvs_create_index(
+            self.index_name,
+            2,
+            distance_type=DistanceMetric.L2,
+        )
+        self.assertTrue(ret)
+        for i, d in enumerate(filter_test_data):
+            ret = client.tvs_hset(self.index_name, str(i), **d)
+            self.assertEqual(ret, 3)
+
+    def test_1_knnsearch(self):
+        result = client.tvs_knnsearch(self.index_name, 5, vector=[0, 0])
+        self.assertListEqual([t[0] for t in result], [b"6", b"3", b"5", b"8", b"9"])
+        result = client.tvs_knnsearch(self.index_name, 5, vector=[0, 0], MAX_DIST=50)
+        self.assertListEqual([t[0] for t in result], [b"6", b"3", b"5", b"8"])
+        result = client.tvs_knnsearch(
+            self.index_name, 5, vector=[0, 0], filter_str="age<20"
+        )
+        self.assertListEqual([t[0] for t in result], [b"6", b"8", b"9", b"0"])
+        result = client.tvs_knnsearch(
+            self.index_name, 5, vector=[0, 0], MAX_DIST=50, filter_str="age<20"
+        )
+        self.assertListEqual([t[0] for t in result], [b"6", b"8"])
+
+    def test_2_mknnsearch(self):
+        result = client.tvs_mknnsearch(self.index_name, 5, [[0, 0]])
+        self.assertListEqual([t[0] for t in result[0]], [b"6", b"3", b"5", b"8", b"9"])
+        result = client.tvs_mknnsearch(self.index_name, 5, [[0, 0]], MAX_DIST=50)
+        self.assertListEqual([t[0] for t in result[0]], [b"6", b"3", b"5", b"8"])
+        result = client.tvs_mknnsearch(
+            self.index_name, 5, [[0, 0]], filter_str="age<20"
+        )
+        self.assertListEqual([t[0] for t in result[0]], [b"6", b"8", b"9", b"0"])
+        result = client.tvs_mknnsearch(
+            self.index_name, 5, [[0, 0]], MAX_DIST=50, filter_str="age<20"
+        )
+        self.assertListEqual([t[0] for t in result[0]], [b"6", b"8"])
+
+    def test_3_mindexknnsearch(self):
+        result = client.tvs_mindexknnsearch([self.index_name], 5, vector=[0, 0])
+        self.assertListEqual([t[0] for t in result], [b"6", b"3", b"5", b"8", b"9"])
+        result = client.tvs_mindexknnsearch(
+            [self.index_name], 5, vector=[0, 0], MAX_DIST=50
+        )
+        self.assertListEqual([t[0] for t in result], [b"6", b"3", b"5", b"8"])
+        result = client.tvs_mindexknnsearch(
+            [self.index_name], 5, vector=[0, 0], filter_str="age<20"
+        )
+        self.assertListEqual([t[0] for t in result], [b"6", b"8", b"9", b"0"])
+        result = client.tvs_mindexknnsearch(
+            [self.index_name], 5, vector=[0, 0], MAX_DIST=50, filter_str="age<20"
+        )
+        self.assertListEqual([t[0] for t in result], [b"6", b"8"])
+
+    def test_4_mindexmknnsearch(self):
+        result = client.tvs_mindexmknnsearch([self.index_name], 5, [[0, 0]])
+        self.assertListEqual([t[0] for t in result[0]], [b"6", b"3", b"5", b"8", b"9"])
+        result = client.tvs_mindexmknnsearch(
+            [self.index_name], 5, [[0, 0]], MAX_DIST=50
+        )
+        self.assertListEqual([t[0] for t in result[0]], [b"6", b"3", b"5", b"8"])
+        result = client.tvs_mindexmknnsearch(
+            [self.index_name], 5, [[0, 0]], filter_str="age<20"
+        )
+        self.assertListEqual([t[0] for t in result[0]], [b"6", b"8", b"9", b"0"])
+        result = client.tvs_mindexmknnsearch(
+            [self.index_name], 5, [[0, 0]], MAX_DIST=50, filter_str="age<20"
+        )
+        self.assertListEqual([t[0] for t in result[0]], [b"6", b"8"])
+
+    def test_9_cleanup(self):
+        ret = client.tvs_del_index(self.index_name)
         self.assertEqual(ret, 1)
 
 
