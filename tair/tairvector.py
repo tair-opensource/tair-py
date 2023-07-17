@@ -307,9 +307,6 @@ class TairVectorCommands:
         """
         return self.execute_command(self.HMGET_CMD, index, key, *args)
 
-    # def tvs_hmget(self, index: str, key: str,fields: Iterable[str]):
-    #     return self.execute_command(self.HMGET_CMD, index,key, *fields)
-
     def tvs_scan(
         self,
         index: str,
@@ -341,6 +338,35 @@ class TairVectorCommands:
 
         return TairVectorScanResult(self, get_batch)
 
+    def _tvs_scan(
+        self,
+        index: str,
+        cursor: int = 0,
+        count: Optional[int] = None,
+        pattern: Optional[str] = None,
+        filter_str: Optional[str] = None,
+        vector: Union[VectorType, bytes, None] = None,
+        max_dist: Optional[float] = None,
+    ):
+        args = [] if pattern is None else ["MATCH", pattern]
+        if count is not None:
+            args += ("COUNT", count)
+        if filter_str is not None:
+            args.append("FILTER")
+            args.append(filter_str)
+        if vector is not None and max_dist is not None:
+            args.append("VECTOR")
+            args.append(
+                vector if isinstance(vector, bytes) else self.encode_vector(vector)
+            )
+            args.append("MAX_DIST")
+            args.append(max_dist)
+        elif vector is None and max_dist is None:
+            pass
+        else:
+            raise ValueError("missing vector or max_dist")
+        return self.execute_command(self.SCAN_CMD, index, cursor, *args)
+
     SEARCH_CMD = "TVS.KNNSEARCH"
     MSEARCH_CMD = "TVS.MKNNSEARCH"
     MINDEXKNNSEARCH_CMD = "TVS.MINDEXKNNSEARCH"
@@ -350,7 +376,7 @@ class TairVectorCommands:
         self,
         index: str,
         k: int,
-        vector: Union[VectorType, str],
+        vector: Union[VectorType, str, bytes],
         is_binary: bool = False,
         filter_str: Optional[str] = None,
         **kwargs
@@ -359,7 +385,7 @@ class TairVectorCommands:
         search for the top @k approximate nearest neighbors of @vector in an index
         """
         params = reduce(lambda x, y: x + y, kwargs.items(), ())
-        if not isinstance(vector, str):
+        if (not isinstance(vector, str)) and (not isinstance(vector, bytes)):
             vector = TairVectorCommands.encode_vector(vector, is_binary)
         if filter_str is None:
             return self.execute_command(self.SEARCH_CMD, index, k, vector, *params)
@@ -406,7 +432,7 @@ class TairVectorCommands:
         self,
         index: Sequence[str],
         k: int,
-        vector: Union[VectorType, str],
+        vector: Union[VectorType, str, bytes],
         is_binary: bool = False,
         filter_str: Optional[str] = None,
         **kwargs
@@ -415,7 +441,7 @@ class TairVectorCommands:
         search for the top @k approximate nearest neighbors of @vector in indexs
         """
         params = reduce(lambda x, y: x + y, kwargs.items(), ())
-        if not isinstance(vector, str):
+        if (not isinstance(vector, str)) and (not isinstance(vector, bytes)):
             vector = TairVectorCommands.encode_vector(vector, is_binary)
         if filter_str is None:
             return self.execute_command(
