@@ -1,5 +1,6 @@
+from concurrent.futures import ThreadPoolExecutor
 from functools import partial, reduce
-from typing import Dict, List, Sequence, Tuple, Union, Optional
+from typing import Dict, List, Sequence, Tuple, Union, Optional, Iterable
 
 from redis.client import pairs_to_dict
 from redis.utils import str_if_bytes
@@ -487,6 +488,88 @@ class TairVectorCommands:
             filter_str,
             *params
         )
+
+    GETDISTANCE_CMD = "TVS.GETDISTANCE"
+
+    def _tvs_getdistance(
+        self,
+        index_name: str,
+        vector: VectorType,
+        keys: Iterable[str],
+        top_n: Optional[int] = None,
+        max_dist: Optional[float] = None,
+        filter_str: Optional[str] = None,
+    ):
+        """
+        low level interface for TVS.GETDISTANCE
+        """
+        args = list(keys)
+        if top_n is not None:
+            args += ("TOPN", top_n)
+        if (not isinstance(vector, str)) and (not isinstance(vector, bytes)):
+            vector_str = self.encode_vector(vector)
+        else:
+            vector_str = vector
+        return self.execute_command(
+            self.GETDISTANCE_CMD, index_name, vector_str, len(keys), *args
+        )
+
+    def tvs_getdistance(
+        self,
+        index_name: str,
+        vector: Union[VectorType, str, bytes],
+        keys: Iterable[str],
+        batch_size: int = 100000,
+        parallelism: int = 1,
+        top_n: Optional[int] = None,
+        max_dist: Optional[float] = None,
+        filter_str: Optional[str] = None,
+    ):
+        """
+        wrapped interface for TVS.GETDISTANCE
+        """
+        import heapq
+        import itertools
+
+        if (not isinstance(vector, str)) and (not isinstance(vector, bytes)):
+            vector_str = self.encode_vector(vector)
+        else:
+            vector_str = vector
+
+        k = len(keys)
+        if top_n is not None:
+            k = min(k, top_n)
+
+        args = ["TOPN", k]
+
+        def process_batch(batch):
+            return self.execute_command(
+                self.GETDISTANCE_CMD,
+                index_name,
+                vector_str,
+                len(batch),
+                *(batch + args)
+            )
+
+        with ThreadPoolExecutor(max_workers=parallelism) as executor:
+            batches = [
+                keys[i : i + batch_size] for i in range(0, len(keys), batch_size)
+            ]
+
+            futures = [executor.submit(process_batch, batch) for batch in batches]
+
+            queue = []
+            for f in futures:
+                result = f.result()
+                queue = heapq.merge(
+                    queue,
+                    [
+                        (float(result[i + 1]), result[i])
+                        for i in range(0, len(result), 2)
+                    ],
+                )
+            queue = itertools.islice(queue, k)
+            return [(key, score) for score, key in queue]
 
 
 def parse_tvs_get_index_result(resp) -> Union[Dict, None]:
