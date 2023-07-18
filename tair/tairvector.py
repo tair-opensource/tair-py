@@ -506,6 +506,11 @@ class TairVectorCommands:
         args = list(keys)
         if top_n is not None:
             args += ("TOPN", top_n)
+        if max_dist is not None:
+            args += ("MAX_DIST", max_dist)
+        if filter_str is not None:
+            args += ("FILTER", filter_str)
+
         if (not isinstance(vector, str)) and (not isinstance(vector, bytes)):
             vector_str = self.encode_vector(vector)
         else:
@@ -541,6 +546,10 @@ class TairVectorCommands:
             k = min(k, top_n)
 
         args = ["TOPN", k]
+        if max_dist is not None:
+            args += ("MAX_DIST", max_dist)
+        if filter_str is not None:
+            args += ("FILTER", filter_str)
 
         def process_batch(batch):
             return self.execute_command(
