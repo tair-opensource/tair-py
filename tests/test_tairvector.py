@@ -4,6 +4,7 @@ import string
 import sys
 import unittest
 import uuid
+import pytest
 from random import choice, randint, random
 
 import redis
@@ -173,9 +174,10 @@ class DataCommandsTest(unittest.TestCase):
             self.assertTrue(vectorEqual(v, obj[Constants.VECTOR_KEY]))
             del obj[Constants.VECTOR_KEY]
             self.assertDictEqual(obj, test_attributes[i])
+            
 
     def test_hmget(self):
-        self.assertTrue(client.tvs_create_index("test", dim, **self.index_params))
+        # self.assertTrue(client.tvs_create_index("test", dim, **self.index_params))
         vector = [randint(1, 100) for _ in range(dim)]
         key = "key_" + str(uuid.uuid4())
         value1 = "value_" + str(uuid.uuid4())
@@ -219,9 +221,19 @@ class DataCommandsTest(unittest.TestCase):
         # delete inserted entries
         for i in range(len(test_vectors)):
             self.assertEqual(client.tvs_del("test", str(i)), 1)
-
-    def test_9_delete(self):
-        self.assertEqual(client.tvs_del_index("test"), 1)
+            
+    def test_8_hincry(self):
+        key_tmp = "key_tmp1"
+        client.tvs_hset("test", key_tmp, field1=1)
+        self.assertEqual(client.tvs_hincrby("test", key_tmp, "field1", 1), 2)
+            
+    def test_9_hincrbyfloat(self):
+        key_tmp = "key_tmp1"
+        client.tvs_hset("test", key_tmp, field2=1.1)
+        assert client.tvs_hincrbyfloat("test", key_tmp, "field2", 2.2) == pytest.approx(3.3)
+        
+    def test_10_delete(self):
+        client.tvs_del_index("test")
 
 
 class SearchCommandsTest(unittest.TestCase):

@@ -33,6 +33,7 @@ from tair.tairvector import (
     parse_tvs_hmget_result,
     parse_tvs_msearch_result,
     parse_tvs_search_result,
+    parse_tvs_hincrbyfloat_result,
 )
 from tair.tairzset import TairZsetCommands, parse_tair_zset_items
 
@@ -155,6 +156,8 @@ TAIR_RESPONSE_CALLBACKS = {
     "TVS.MKNNSEARCH": parse_tvs_msearch_result,
     "TVS.MINDEXKNNSEARCH": parse_tvs_search_result,
     "TVS.MINDEXMKNNSEARCH": parse_tvs_msearch_result,
+    "TVS.HINCRBY": int_or_none,
+    "TVS.HINCRBYFLOAT": parse_tvs_hincrbyfloat_result,
 }
 
 

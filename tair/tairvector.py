@@ -579,7 +579,21 @@ class TairVectorCommands:
                 )
             queue = itertools.islice(queue, k)
             return [(key, score) for score, key in queue]
+        
+    HINCRBY_CMD = "TVS.HINCRBY"
+    HINCRBYFLOAT_CMD = "TVS.HINCRBYFLOAT"
+    
+    def tvs_hincrby(self, index: str, key: str, field: str, num: int):
+        """
+        increment the long value of a tairvector field by the given amount, not support field VECTOR
+        """
+        return self.execute_command(self.HINCRBY_CMD, index, key, field, num)
 
+    def tvs_hincrbyfloat(self, index: str, key: str, field: str, num: float):
+        """
+        increment the float value of a tairvector field by the given amount, not support field VECTOR
+        """
+        return self.execute_command(self.HINCRBYFLOAT_CMD, index, key, field, num)
 
 def parse_tvs_get_index_result(resp) -> Union[Dict, None]:
     if len(resp) == 0:
@@ -610,3 +624,9 @@ def parse_tvs_search_result(resp) -> List[Tuple]:
 
 def parse_tvs_msearch_result(resp) -> List[List[Tuple]]:
     return [parse_tvs_search_result(r) for r in resp]
+
+
+def parse_tvs_hincrbyfloat_result(resp) -> Union[float, None]:
+    if resp is None:
+        return resp
+    return float(resp.decode())
