@@ -50,7 +50,6 @@ class TestTairSearch:
         assert t.tft_updateindex(index, mappings2)
         t.delete(index)
 
-
     def test_tft_getindex(self, t: Tair):
         index = "idx_" + str(uuid.uuid4())
         mappings = """
@@ -455,7 +454,7 @@ class TestTairSearch:
         result = t.tft_search(index, '{"sort":[{"price":{"order":"desc"}}]}', True)
         assert json.loads(want) == json.loads(result)
         result = t.tft_explaincost(index, '{"sort":[{"price":{"order":"desc"}}]}')
-        assert json.loads(result)['QUERY_COST']
+        assert json.loads(result)["QUERY_COST"]
         t.delete(index)
 
     def test_tft_msearch(self, t: Tair):
@@ -480,12 +479,8 @@ class TestTairSearch:
 
         assert t.tft_createindex(index1, mappings)
         assert t.tft_createindex(index2, mappings)
-        assert t.tft_madddoc(
-            index1, {document1: "00001", document2: "00002"}
-        )
-        assert t.tft_madddoc(
-            index2, {document3: "00003", document4: "00004"}
-        )
+        assert t.tft_madddoc(index1, {document1: "00001", document2: "00002"})
+        assert t.tft_madddoc(index2, {document3: "00003", document4: "00004"})
 
         want = f"""{{
     "aux_info": {{"index_crc64": 5843875291690071373}},
@@ -520,7 +515,9 @@ class TestTairSearch:
         "total": {{ "relation": "eq", "value": 4 }}
       }}
     }}"""
-        result = t.tft_msearch(2, {index1, index2}, '{"sort":[{"_doc":{"order":"asc"}}]}')
+        result = t.tft_msearch(
+            2, {index1, index2}, '{"sort":[{"_doc":{"order":"asc"}}]}'
+        )
         assert json.loads(want) == json.loads(result)
         t.delete(index1)
         t.delete(index2)
@@ -547,11 +544,13 @@ class TestTairSearch:
     }
   }
 }"""
-        text = 'This is tair-py.'
+        text = "This is tair-py."
 
         assert t.tft_createindex(index, mappings)
-        assert t.tft_analyzer("standard", text) == t.tft_analyzer("my_analyzer", text, index)
-        assert 'consuming time' in str(t.tft_analyzer("standard", text, None, True))
+        assert t.tft_analyzer("standard", text) == t.tft_analyzer(
+            "my_analyzer", text, index
+        )
+        assert "consuming time" in str(t.tft_analyzer("standard", text, None, True))
 
         t.delete(index)
 

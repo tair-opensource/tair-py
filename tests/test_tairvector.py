@@ -2,22 +2,17 @@
 import os
 import string
 import sys
+import time
 import unittest
 import uuid
-import pytest
-import time
 from random import choice, randint, random
 
+import pytest
 import redis
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from tair.tairvector import (
-    Constants,
-    DataType,
-    DistanceMetric,
-    TairVectorIndex
-)
+from tair.tairvector import Constants, DataType, DistanceMetric, TairVectorIndex
 
 from .conftest import get_tair_client
 
@@ -34,7 +29,7 @@ attr_values = [
     for _ in range(num_vectors * num_attrs)
 ]
 test_attributes = [
-    dict(zip(attr_keys, attr_values[i: i + 3]))
+    dict(zip(attr_keys, attr_values[i : i + 3]))
     for i in range(0, num_vectors * num_attrs, num_attrs)
 ]
 
@@ -229,7 +224,9 @@ class DataCommandsTest(unittest.TestCase):
     def test_9_hincrbyfloat(self):
         key_tmp = "key_tmp1"
         client.tvs_hset("test", key_tmp, field2=1.1)
-        assert client.tvs_hincrbyfloat("test", key_tmp, "field2", 2.2) == pytest.approx(3.3)
+        assert client.tvs_hincrbyfloat("test", key_tmp, "field2", 2.2) == pytest.approx(
+            3.3
+        )
 
     def test_10_delete(self):
         client.tvs_del_index("test")
@@ -729,7 +726,15 @@ class VectorExpireTest(unittest.TestCase):
         key = "key_" + str(uuid.uuid4())
         vector = [random() for _ in range(dim)]
         self.assertEqual(
-            client.tvs_hset(self.index_name, key, vector, field1=str(uuid.uuid4()), field2=randint(0, 100)), 3)
+            client.tvs_hset(
+                self.index_name,
+                key,
+                vector,
+                field1=str(uuid.uuid4()),
+                field2=randint(0, 100),
+            ),
+            3,
+        )
         self.assertEqual(client.tvs_hexpire(self.index_name, key, 100), 1)
         assert 0 < client.tvs_httl(self.index_name, key) <= 100
 
@@ -738,7 +743,15 @@ class VectorExpireTest(unittest.TestCase):
         key = "key_" + str(uuid.uuid4())
         vector = [random() for _ in range(dim)]
         self.assertEqual(
-            client.tvs_hset(self.index_name, key, vector, field1=str(uuid.uuid4()), field2=randint(0, 100)), 3)
+            client.tvs_hset(
+                self.index_name,
+                key,
+                vector,
+                field1=str(uuid.uuid4()),
+                field2=randint(0, 100),
+            ),
+            3,
+        )
         self.assertEqual(client.tvs_hpexpire(self.index_name, key, 100), 1)
         assert 0 < client.tvs_hpttl(self.index_name, key) <= 100
 
@@ -748,7 +761,15 @@ class VectorExpireTest(unittest.TestCase):
         vector = [random() for _ in range(dim)]
         abs_expire = int(time.time()) + 100
         self.assertEqual(
-            client.tvs_hset(self.index_name, key, vector, field1=str(uuid.uuid4()), field2=randint(0, 100)), 3)
+            client.tvs_hset(
+                self.index_name,
+                key,
+                vector,
+                field1=str(uuid.uuid4()),
+                field2=randint(0, 100),
+            ),
+            3,
+        )
         self.assertEqual(client.tvs_hexpireat(self.index_name, key, abs_expire), 1)
         assert 0 < client.tvs_httl(self.index_name, key) <= 100
         self.assertEqual(client.tvs_hexpiretime(self.index_name, key), abs_expire)
@@ -759,7 +780,15 @@ class VectorExpireTest(unittest.TestCase):
         vector = [random() for _ in range(dim)]
         abs_expire = int(time.time() * 1000) + 100
         self.assertEqual(
-            client.tvs_hset(self.index_name, key, vector, field1=str(uuid.uuid4()), field2=randint(0, 100)), 3)
+            client.tvs_hset(
+                self.index_name,
+                key,
+                vector,
+                field1=str(uuid.uuid4()),
+                field2=randint(0, 100),
+            ),
+            3,
+        )
         self.assertEqual(client.tvs_hpexpireat(self.index_name, key, abs_expire), 1)
         assert 0 < client.tvs_hpttl(self.index_name, key) <= 100
         self.assertEqual(client.tvs_hpexpiretime(self.index_name, key), abs_expire)

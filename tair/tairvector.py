@@ -1,10 +1,11 @@
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial, reduce
-from typing import Dict, List, Sequence, Tuple, Union, Optional, Iterable
-from tair.typing import AbsExpiryT, CommandsProtocol, ExpiryT, ResponseT
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 from redis.client import pairs_to_dict
 from redis.utils import str_if_bytes
+
+from tair.typing import AbsExpiryT, CommandsProtocol, ExpiryT, ResponseT
 
 VectorType = Sequence[Union[int, float]]
 
@@ -123,11 +124,11 @@ class TairVectorIndex:
 
         # bind methods
         for method in (
-                "tvs_del",
-                "tvs_hdel",
-                "tvs_hgetall",
-                "tvs_hmget",
-                "tvs_scan",
+            "tvs_del",
+            "tvs_hdel",
+            "tvs_hgetall",
+            "tvs_hmget",
+            "tvs_scan",
         ):
             attr = getattr(TairVectorCommands, method)
             if callable(attr):
@@ -150,11 +151,11 @@ class TairVectorIndex:
         return self.client.tvs_hset(self.name, key, vector, self.is_binary, **kwargs)
 
     def tvs_knnsearch(
-            self,
-            k: int,
-            vector: Union[VectorType, str],
-            filter_str: Optional[str] = None,
-            **kwargs
+        self,
+        k: int,
+        vector: Union[VectorType, str],
+        filter_str: Optional[str] = None,
+        **kwargs
     ):
         """search for the top @k approximate nearest neighbors of @vector"""
         return self.client.tvs_knnsearch(
@@ -162,11 +163,11 @@ class TairVectorIndex:
         )
 
     def tvs_mknnsearch(
-            self,
-            k: int,
-            vectors: Sequence[VectorType],
-            filter_str: Optional[str] = None,
-            **kwargs
+        self,
+        k: int,
+        vectors: Sequence[VectorType],
+        filter_str: Optional[str] = None,
+        **kwargs
     ):
         """batch approximate nearest neighbors search for a list of vectors"""
         return self.client.tvs_mknnsearch(
@@ -190,13 +191,13 @@ class TairVectorCommands(CommandsProtocol):
     SCAN_INDEX_CMD = "TVS.SCANINDEX"
 
     def tvs_create_index(
-            self,
-            name: str,
-            dim: int,
-            distance_type: str = DistanceMetric.L2,
-            index_type: str = IndexType.HNSW,
-            data_type: str = DataType.Float32,
-            **kwargs
+        self,
+        name: str,
+        dim: int,
+        distance_type: str = DistanceMetric.L2,
+        index_type: str = IndexType.HNSW,
+        data_type: str = DataType.Float32,
+        **kwargs
     ):
         """
         create a vector
@@ -231,7 +232,7 @@ class TairVectorCommands(CommandsProtocol):
         return self.execute_command(self.DEL_INDEX_CMD, name)
 
     def tvs_scan_index(
-            self, pattern: Optional[str] = None, batch: int = 10
+        self, pattern: Optional[str] = None, batch: int = 10
     ) -> TairVectorScanResult:
         """
         scan all the indices
@@ -257,12 +258,12 @@ class TairVectorCommands(CommandsProtocol):
     SCAN_CMD = "TVS.SCAN"
 
     def tvs_hset(
-            self,
-            index: str,
-            key: str,
-            vector: Union[VectorType, str, None] = None,
-            is_binary=False,
-            **kwargs
+        self,
+        index: str,
+        key: str,
+        vector: Union[VectorType, str, None] = None,
+        is_binary=False,
+        **kwargs
     ):
         """
         add/update a data entry to index
@@ -309,13 +310,13 @@ class TairVectorCommands(CommandsProtocol):
         return self.execute_command(self.HMGET_CMD, index, key, *args)
 
     def tvs_scan(
-            self,
-            index: str,
-            pattern: Optional[str] = None,
-            batch: int = 10,
-            filter_str: Optional[str] = None,
-            vector: Optional[VectorType] = None,
-            max_dist: Optional[float] = None,
+        self,
+        index: str,
+        pattern: Optional[str] = None,
+        batch: int = 10,
+        filter_str: Optional[str] = None,
+        vector: Optional[VectorType] = None,
+        max_dist: Optional[float] = None,
     ):
         """
         scan all data entries in an index
@@ -340,14 +341,14 @@ class TairVectorCommands(CommandsProtocol):
         return TairVectorScanResult(self, get_batch)
 
     def _tvs_scan(
-            self,
-            index: str,
-            cursor: int = 0,
-            count: Optional[int] = None,
-            pattern: Optional[str] = None,
-            filter_str: Optional[str] = None,
-            vector: Union[VectorType, bytes, None] = None,
-            max_dist: Optional[float] = None,
+        self,
+        index: str,
+        cursor: int = 0,
+        count: Optional[int] = None,
+        pattern: Optional[str] = None,
+        filter_str: Optional[str] = None,
+        vector: Union[VectorType, bytes, None] = None,
+        max_dist: Optional[float] = None,
     ):
         args = [] if pattern is None else ["MATCH", pattern]
         if count is not None:
@@ -374,13 +375,13 @@ class TairVectorCommands(CommandsProtocol):
     MINDEXMKNNSEARCH_CMD = "TVS.MINDEXMKNNSEARCH"
 
     def tvs_knnsearch(
-            self,
-            index: str,
-            k: int,
-            vector: Union[VectorType, str, bytes],
-            is_binary: bool = False,
-            filter_str: Optional[str] = None,
-            **kwargs
+        self,
+        index: str,
+        k: int,
+        vector: Union[VectorType, str, bytes],
+        is_binary: bool = False,
+        filter_str: Optional[str] = None,
+        **kwargs
     ):
         """
         search for the top @k approximate nearest neighbors of @vector in an index
@@ -395,13 +396,13 @@ class TairVectorCommands(CommandsProtocol):
         )
 
     def tvs_mknnsearch(
-            self,
-            index: str,
-            k: int,
-            vectors: Sequence[VectorType],
-            is_binary: bool = False,
-            filter_str: Optional[str] = None,
-            **kwargs
+        self,
+        index: str,
+        k: int,
+        vectors: Sequence[VectorType],
+        is_binary: bool = False,
+        filter_str: Optional[str] = None,
+        **kwargs
     ):
         """
         batch approximate nearest neighbors search for a list of vectors
@@ -430,13 +431,13 @@ class TairVectorCommands(CommandsProtocol):
         )
 
     def tvs_mindexknnsearch(
-            self,
-            index: Sequence[str],
-            k: int,
-            vector: Union[VectorType, str, bytes],
-            is_binary: bool = False,
-            filter_str: Optional[str] = None,
-            **kwargs
+        self,
+        index: Sequence[str],
+        k: int,
+        vector: Union[VectorType, str, bytes],
+        is_binary: bool = False,
+        filter_str: Optional[str] = None,
+        **kwargs
     ):
         """
         search for the top @k approximate nearest neighbors of @vector in indexs
@@ -453,13 +454,13 @@ class TairVectorCommands(CommandsProtocol):
         )
 
     def tvs_mindexmknnsearch(
-            self,
-            index: Sequence[str],
-            k: int,
-            vectors: Sequence[VectorType],
-            is_binary: bool = False,
-            filter_str: Optional[str] = None,
-            **kwargs
+        self,
+        index: Sequence[str],
+        k: int,
+        vectors: Sequence[VectorType],
+        is_binary: bool = False,
+        filter_str: Optional[str] = None,
+        **kwargs
     ):
         """
         batch approximate nearest neighbors search for a list of vectors
@@ -492,13 +493,13 @@ class TairVectorCommands(CommandsProtocol):
     GETDISTANCE_CMD = "TVS.GETDISTANCE"
 
     def _tvs_getdistance(
-            self,
-            index_name: str,
-            vector: VectorType,
-            keys: Iterable[str],
-            top_n: Optional[int] = None,
-            max_dist: Optional[float] = None,
-            filter_str: Optional[str] = None,
+        self,
+        index_name: str,
+        vector: VectorType,
+        keys: Iterable[str],
+        top_n: Optional[int] = None,
+        max_dist: Optional[float] = None,
+        filter_str: Optional[str] = None,
     ):
         """
         low level interface for TVS.GETDISTANCE
@@ -520,15 +521,15 @@ class TairVectorCommands(CommandsProtocol):
         )
 
     def tvs_getdistance(
-            self,
-            index_name: str,
-            vector: Union[VectorType, str, bytes],
-            keys: Iterable[str],
-            batch_size: int = 100000,
-            parallelism: int = 1,
-            top_n: Optional[int] = None,
-            max_dist: Optional[float] = None,
-            filter_str: Optional[str] = None,
+        self,
+        index_name: str,
+        vector: Union[VectorType, str, bytes],
+        keys: Iterable[str],
+        batch_size: int = 100000,
+        parallelism: int = 1,
+        top_n: Optional[int] = None,
+        max_dist: Optional[float] = None,
+        filter_str: Optional[str] = None,
     ):
         """
         wrapped interface for TVS.GETDISTANCE
@@ -562,7 +563,7 @@ class TairVectorCommands(CommandsProtocol):
 
         with ThreadPoolExecutor(max_workers=parallelism) as executor:
             batches = [
-                keys[i: i + batch_size] for i in range(0, len(keys), batch_size)
+                keys[i : i + batch_size] for i in range(0, len(keys), batch_size)
             ]
 
             futures = [executor.submit(process_batch, batch) for batch in batches]

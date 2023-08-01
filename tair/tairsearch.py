@@ -153,11 +153,18 @@ class TairSearchCommands(CommandsProtocol):
             pieces.append("use_cache")
         return self.execute_command("TFT.SEARCH", *pieces)
 
-    def tft_msearch(self, index_count: int, index: Iterable[KeyT], query: str) -> ResponseT:
+    def tft_msearch(
+        self, index_count: int, index: Iterable[KeyT], query: str
+    ) -> ResponseT:
         return self.execute_command("TFT.MSEARCH", index_count, *index, query)
 
-    def tft_analyzer(self, analyzer_name: str, text: str, index: Optional[KeyT] = None,
-                     show_time: Optional[bool] = False) -> ResponseT:
+    def tft_analyzer(
+        self,
+        analyzer_name: str,
+        text: str,
+        index: Optional[KeyT] = None,
+        show_time: Optional[bool] = False,
+    ) -> ResponseT:
         pieces: List[EncodableT] = [analyzer_name, text]
         if index is not None:
             pieces.append("INDEX")
@@ -167,9 +174,11 @@ class TairSearchCommands(CommandsProtocol):
         target_nodes = None
         if isinstance(self, tair.TairCluster):
             if index is None:
-                target_nodes = 'random'
+                target_nodes = "random"
             else:
-                target_nodes = self.nodes_manager.get_node_from_slot(self.keyslot(index))
+                target_nodes = self.nodes_manager.get_node_from_slot(
+                    self.keyslot(index)
+                )
         return self.execute_command("TFT.ANALYZER", *pieces, target_nodes=target_nodes)
 
     def tft_explaincost(self, index: KeyT, query: str) -> ResponseT:
