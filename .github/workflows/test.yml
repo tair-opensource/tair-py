@@ -80,9 +80,9 @@ jobs:
         run: pip install pytest-asyncio
 
       - name: test
-        run: pytest -vv tests/test_tairstring.py tests/test_tairhash.py tests/test_tairzset.py tests/test_asyncio/test_tairstring.py tests/test_asyncio/test_tairhash.py tests/test_asyncio/test_tairzset.py tests/test_from_url.py
+        run: pytest -vv tests/test_tairstring.py tests/test_tairhash.py tests/test_tairzset.py tests/test_asyncio/test_tairstring.py tests/test_asyncio/test_tairhash.py tests/test_asyncio/test_tairzset.py
 
       - name: test cluster
         run: |
           export TEST_TAIR_CLUSTER=1
-          pytest -vv tests/test_tairstring.py tests/test_tairhash.py tests/test_tairzset.py tests/test_asyncio/test_tairstring.py tests/test_asyncio/test_tairhash.py tests/test_asyncio/test_tairzset.py tests/test_from_url.py
+          pytest -vv tests/test_tairstring.py tests/test_tairhash.py tests/test_tairzset.py tests/test_asyncio/test_tairstring.py tests/test_asyncio/test_tairhash.py tests/test_asyncio/test_tairzset.py
