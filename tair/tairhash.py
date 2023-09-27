@@ -15,7 +15,7 @@ from tair.typing import (
 
 
 class ValueVersionItem:
-    def __init__(self, value: bytes, version: int) -> None:
+    def __init__(self, value: Union[bytes, str], version: int) -> None:
         self.value = value
         self.version = version
 
@@ -28,11 +28,11 @@ class ValueVersionItem:
         return not self.__eq__(other)
 
     def __repr__(self) -> str:
-        return f"{{value: {self.value.decode()}, version: {self.version}}}"
+        return f"{{value: {self.value}, version: {self.version}}}"
 
 
 class FieldValueItem:
-    def __init__(self, field: bytes, value: bytes) -> None:
+    def __init__(self, field: Union[bytes, str], value: Union[bytes, str]) -> None:
         self.field = field
         self.value = value
 
@@ -41,15 +41,26 @@ class FieldValueItem:
             return False
         return self.field == other.field and self.value == other.value
 
+    def __lt__(self, other: object) -> bool:
+        if not isinstance(other, FieldValueItem):
+            raise TypeError(
+                "Cannot compare 'FieldValueItem' with non-FieldValueItem objects."
+            )
+        return self.field < other.field or (
+            self.field == other.field and self.value < other.value
+        )
+
     def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
     def __repr__(self) -> str:
-        return f"{{field: {self.field.decode()}, value: {self.value.decode()}}}"
+        return f"{{field: {self.field}, value: {self.value}}}"
 
 
 class ExhscanResult:
-    def __init__(self, next_field: bytes, items: Iterable[FieldValueItem]) -> None:
+    def __init__(
+        self, next_field: Union[bytes, str], items: Iterable[FieldValueItem]
+    ) -> None:
         self.next_field = next_field
         self.items = list(items)
 
@@ -62,7 +73,7 @@ class ExhscanResult:
         return not self.__eq__(other)
 
     def __repr__(self) -> str:
-        return f"{{next_field: {self.next_field.decode()}, items: {self.items}}}"
+        return f"{{next_field: {self.next_field}, items: {self.items}}}"
 
 
 class TairHashCommands(CommandsProtocol):
@@ -417,7 +428,7 @@ class TairHashCommands(CommandsProtocol):
 def parse_exhincrbyfloat(resp) -> Union[float, None]:
     if resp is None:
         return resp
-    return float(resp.decode())
+    return float(resp)
 
 
 def parse_exhgetwithver(resp) -> Union[ValueVersionItem, None]:

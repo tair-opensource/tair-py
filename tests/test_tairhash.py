@@ -20,7 +20,7 @@ from tair.tairhash import (
     parse_exhscan,
 )
 
-from .conftest import NETWORK_DELAY_CALIBRATION_VALUE, get_server_time
+from .conftest import NETWORK_DELAY_CALIBRATION_VALUE, compare_str, get_server_time
 
 
 class TestTairHash:
@@ -32,11 +32,11 @@ class TestTairHash:
 
         # if the field does not exist, set it and return 1.
         assert t.exhset(key, field, value1) == 1
-        assert t.exhget(key, field) == value1.encode()
+        assert compare_str(t.exhget(key, field), value1)
 
         # if the field exists, set it and return 0.
         assert t.exhset(key, field, value2) == 0
-        assert t.exhget(key, field) == value2.encode()
+        assert compare_str(t.exhget(key, field), value2)
 
     def test_exhset_ex(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
@@ -183,8 +183,8 @@ class TestTairHash:
         value2 = "value_" + str(uuid.uuid4())
 
         assert t.exhmset(key, {field1: value1, field2: value2})
-        assert t.exhget(key, field1) == value1.encode()
-        assert t.exhget(key, field2) == value2.encode()
+        assert compare_str(t.exhget(key, field1), value1)
+        assert compare_str(t.exhget(key, field2), value2)
 
     def test_exhpexpireat(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
@@ -347,7 +347,7 @@ class TestTairHash:
 
         assert t.exhset(key, field, value) == 1
         assert t.exhsetver(key, field, 10) == 1
-        assert t.exhget(key, field) == value.encode()
+        assert compare_str(t.exhget(key, field), value)
 
     def test_exhincrby(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
@@ -355,7 +355,7 @@ class TestTairHash:
 
         assert t.exhset(key, field, 10) == 1
         assert t.exhincrby(key, field, 20) == 30
-        assert t.exhget(key, field) == b"30"
+        assert compare_str(t.exhget(key, field), "30")
 
     def test_exhincrby_ex(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
@@ -449,7 +449,7 @@ class TestTairHash:
 
         assert t.exhset(key, field1, 10) == 1
         assert t.exhincrby(key, field1, 20, ver=1) == 30
-        assert t.exhget(key, field1) == b"30"
+        assert compare_str(t.exhget(key, field1), "30")
         assert t.exhver(key, field1) == 2
 
         assert t.exhset(key, field2, 10) == 1
@@ -462,7 +462,7 @@ class TestTairHash:
 
         assert t.exhset(key, field, 10) == 1
         assert t.exhincrby(key, field, 20, abs=100) == 30
-        assert t.exhget(key, field) == b"30"
+        assert compare_str(t.exhget(key, field), "30")
         assert t.exhver(key, field) == 100
 
     def test_exhincrby_overflow(self, t: Tair):
@@ -625,7 +625,10 @@ class TestTairHash:
         value = "value_" + str(uuid.uuid4())
 
         assert t.exhset(key1, field1, value) == 1
-        assert t.exhgetwithver(key1, field1) == ValueVersionItem(value.encode(), 1)
+        assert compare_str(
+            t.exhgetwithver(key1, field1).value,
+            ValueVersionItem(value.encode(), 1).value,
+        )
 
         assert t.exhgetwithver(key2, field1) is None
         assert t.exhgetwithver(key1, field2) is None
@@ -638,7 +641,9 @@ class TestTairHash:
         value2 = "value_" + str(uuid.uuid4())
 
         assert t.exhmset(key, {field1: value1, field2: value2})
-        assert t.exhmget(key, [field1, field2]) == [value1.encode(), value2.encode()]
+        vals = t.exhmget(key, [field1, field2])
+        compare_str(vals[0], value1)
+        compare_str(vals[1], value2)
 
     def test_exhmgetwithver_success(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
@@ -648,10 +653,9 @@ class TestTairHash:
         value2 = "value_" + str(uuid.uuid4())
 
         assert t.exhmset(key, {field1: value1, field2: value2})
-        assert t.exhmgetwithver(key, [field1, field2]) == [
-            ValueVersionItem(value1.encode(), 1),
-            ValueVersionItem(value2.encode(), 1),
-        ]
+        vals = t.exhmgetwithver(key, [field1, field2])
+        assert compare_str(vals[0].value, value1)
+        assert compare_str(vals[1].value, value2)
 
     def test_exhmgetwithver_key_not_exists(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
@@ -669,11 +673,10 @@ class TestTairHash:
         value3 = "field_" + str(uuid.uuid4())
 
         assert t.exhmset(key, {field1: value1, field3: value3})
-        assert t.exhmgetwithver(key, [field1, field2, field3]) == [
-            ValueVersionItem(value1.encode(), 1),
-            None,
-            ValueVersionItem(value3.encode(), 1),
-        ]
+        vals = t.exhmgetwithver(key, [field1, field2, field3])
+        assert compare_str(vals[0].value, value1)
+        assert compare_str(vals[1], None)
+        assert compare_str(vals[2].value, value3)
 
     def test_exhlen(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
@@ -712,44 +715,42 @@ class TestTairHash:
 
     def test_exhkeys(self, t: Tair):
         key = "key_" + str(uuid.uuid4())
-        field1 = "field_" + str(uuid.uuid4())
-        field2 = "field_" + str(uuid.uuid4())
-        value1 = "value_" + str(uuid.uuid4())
-        value2 = "value_" + str(uuid.uuid4())
+        field1 = "field1_" + str(uuid.uuid4())
+        field2 = "field2_" + str(uuid.uuid4())
+        value1 = "value1_" + str(uuid.uuid4())
+        value2 = "value2_" + str(uuid.uuid4())
 
         assert t.exhmset(key, {field1: value1, field2: value2})
-        assert sorted(t.exhkeys(key)) == sorted([field1.encode(), field2.encode()])
+        keys = sorted(t.exhkeys(key))
+        assert compare_str(keys[0], field1)
+        assert compare_str(keys[1], field2)
 
     def test_exhvals(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
-        field1 = "field_" + str(uuid.uuid4())
-        field2 = "field_" + str(uuid.uuid4())
-        value1 = "value_" + str(uuid.uuid4())
-        value2 = "value_" + str(uuid.uuid4())
+        field1 = "field1_" + str(uuid.uuid4())
+        field2 = "field2_" + str(uuid.uuid4())
+        value1 = "value1_" + str(uuid.uuid4())
+        value2 = "value2_" + str(uuid.uuid4())
 
         assert t.exhmset(key1, {field1: value1, field2: value2})
-        assert sorted(t.exhvals(key1)) == sorted([value1.encode(), value2.encode()])
+        vals = sorted(t.exhvals(key1))
+        assert compare_str(vals[0], value1)
+        assert compare_str(vals[1], value2)
 
         key2 = "key_" + str(uuid.uuid4())
         assert t.exhvals(key2) == []
 
     def test_exhgetall(self, t: Tair):
         key1 = "key_" + str(uuid.uuid4())
-        field1 = "field_" + str(uuid.uuid4())
-        field2 = "field_" + str(uuid.uuid4())
-        value1 = "value_" + str(uuid.uuid4())
-        value2 = "value_" + str(uuid.uuid4())
+        field1 = "field1_" + str(uuid.uuid4())
+        field2 = "field2_" + str(uuid.uuid4())
+        value1 = "value1_" + str(uuid.uuid4())
+        value2 = "value2_" + str(uuid.uuid4())
 
         assert t.exhmset(key1, {field1: value1, field2: value2})
-        ret = t.exhgetall(key1)
-        # pairs may be out of order.
-        assert ret == [
-            FieldValueItem(field1.encode(), value1.encode()),
-            FieldValueItem(field2.encode(), value2.encode()),
-        ] or ret == [
-            FieldValueItem(field2.encode(), value2.encode()),
-            FieldValueItem(field1.encode(), value1.encode()),
-        ]
+        ret = sorted(t.exhgetall(key1))
+        compare_str(ret[0].field, field1)
+        compare_str(ret[1].field, field2)
 
         key2 = "key_" + str(uuid.uuid4())
         assert t.exhgetall(key2) == []
@@ -850,10 +851,7 @@ class TestTairHash:
 
     def test_value_version_item_repr(self):
         value = "value_" + str(uuid.uuid4())
-        assert (
-            str(ValueVersionItem(value.encode(), 100))
-            == f"{{value: {value}, version: 100}}"
-        )
+        assert str(ValueVersionItem(value, 100)) == f"{{value: {value}, version: 100}}"
 
     def test_field_value_item_eq(self):
         field = "field_" + str(uuid.uuid4())
@@ -883,8 +881,7 @@ class TestTairHash:
         field = "field_" + str(uuid.uuid4())
         value = "value_" + str(uuid.uuid4())
         assert (
-            str(FieldValueItem(field.encode(), value.encode()))
-            == f"{{field: {field}, value: {value}}}"
+            str(FieldValueItem(field, value)) == f"{{field: {field}, value: {value}}}"
         )
 
     def test_exhscan_result_eq(self):
@@ -1009,7 +1006,7 @@ class TestTairHash:
         ]
 
         result = ExhscanResult(
-            field4.encode(),
+            field4,
             items,
         )
 

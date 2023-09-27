@@ -1,13 +1,14 @@
-from typing import Iterable, List, Mapping, Optional
+from typing import Iterable, List, Mapping, Optional, Union
 
 from redis.typing import CommandsProtocol
+from redis.utils import str_if_bytes
 
 from tair.exceptions import DataError
 from tair.typing import AnyKeyT, EncodableT, KeyT, ResponseT
 
 
 class TairZsetItem:
-    def __init__(self, member: bytes, score: str) -> None:
+    def __init__(self, member: Union[bytes, str], score: str) -> None:
         self.member = member
         self.score = score
 
@@ -237,7 +238,7 @@ def parse_tair_zset_items(resp, **options):
     result: List[TairZsetItem] = []
     if options.get("withscores"):
         for i in range(0, len(resp), 2):
-            result.append(TairZsetItem(resp[i], resp[i + 1].decode()))
+            result.append(TairZsetItem(resp[i], str_if_bytes(resp[i + 1])))
     else:
         for i in resp:
             result.append(TairZsetItem(i, None))
