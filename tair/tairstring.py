@@ -2,6 +2,9 @@ import datetime
 import time
 from typing import List, Optional, Union
 
+from redis.client import bool_ok
+from redis.utils import str_if_bytes
+
 from tair.exceptions import DataError
 from tair.typing import (
     AbsExpiryT,
@@ -14,7 +17,7 @@ from tair.typing import (
 
 
 class ExgetResult:
-    def __init__(self, value: bytes, version: int) -> None:
+    def __init__(self, value: Union[bytes, str], version: int) -> None:
         self.value = value
         self.version = version
 
@@ -31,7 +34,7 @@ class ExgetResult:
 
 
 class ExcasResult:
-    def __init__(self, msg: str, value: bytes, version: int) -> None:
+    def __init__(self, msg: str, value: Union[bytes, str], version: int) -> None:
         self.msg = msg
         self.value = value
         self.version = version
@@ -272,7 +275,7 @@ class TairStringCommands(CommandsProtocol):
 def parse_exset(resp) -> Union[bool, None]:
     if resp is None:
         return None
-    return resp == b"OK"
+    return bool_ok(resp)
 
 
 def parse_exget(resp) -> ExgetResult:
@@ -282,10 +285,10 @@ def parse_exget(resp) -> ExgetResult:
 def parse_excas(resp) -> ExcasResult:
     if isinstance(resp, int):
         return resp
-    return ExcasResult(resp[0].decode(), resp[1], resp[2])
+    return ExcasResult(str_if_bytes(resp[0]), resp[1], resp[2])
 
 
 def parse_exincrbyfloat(resp) -> Union[float, None]:
     if resp is None:
         return resp
-    return float(resp.decode())
+    return float(resp)

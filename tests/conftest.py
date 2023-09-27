@@ -69,3 +69,12 @@ def get_server_time(client) -> datetime:
     seconds, milliseconds = client.time()
     timestamp = float(f"{seconds}.{milliseconds}")
     return datetime.fromtimestamp(timestamp)
+
+
+def compare_str(left, right):
+    if isinstance(left, bytes):
+        left = left.decode()
+    if isinstance(right, bytes):
+        right = right.decode()
+
+    return left == right

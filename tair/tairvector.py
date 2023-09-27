@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial, reduce
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
-from redis.client import pairs_to_dict
+from redis._parsers.helpers import pairs_to_dict
 from redis.utils import str_if_bytes
 
 from tair.typing import AbsExpiryT, CommandsProtocol, ExpiryT, ResponseT

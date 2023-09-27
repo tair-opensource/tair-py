@@ -2,7 +2,8 @@ from typing import Union
 
 from redis import Redis
 from redis.asyncio import Redis as AsyncRedis
-from redis.client import bool_ok, int_or_none
+from redis.client import bool_ok
+from redis.utils import str_if_bytes
 
 from tair.tairbloom import TairBloomCommands
 from tair.taircpc import CpcUpdate2judResult, TairCpcCommands
@@ -54,14 +55,10 @@ class TairCommands(
     pass
 
 
-def str_if_bytes(value: Union[str, bytes]) -> str:
-    return (
-        value.decode("utf-8", errors="replace") if isinstance(value, bytes) else value
-    )
-
-
-def bool_ok(resp) -> bool:
-    return str_if_bytes(resp) == "OK"
+def int_or_none(response):
+    if response is None:
+        return None
+    return int(response)
 
 
 TAIR_RESPONSE_CALLBACKS = {
@@ -93,27 +90,27 @@ TAIR_RESPONSE_CALLBACKS = {
     "TR.SETBITARRAY": bool_ok,
     "TR.OPTIMIZE": bool_ok,
     "TR.SCAN": parse_tr_scan,
-    "TR.RANGEBITARRAY": lambda resp: resp.decode(),
-    "TR.JACCARD": lambda resp: float(resp.decode()),
+    "TR.RANGEBITARRAY": lambda resp: str_if_bytes(resp),
+    "TR.JACCARD": lambda resp: float(resp),
     # TairSearch
     "TFT.CREATEINDEX": bool_ok,
     "TFT.UPDATEINDEX": bool_ok,
-    "TFT.GETINDEX": lambda resp: None if resp is None else resp.decode(),
-    "TFT.ADDDOC": lambda resp: resp.decode(),
+    "TFT.GETINDEX": lambda resp: None if resp is None else str_if_bytes(resp),
+    "TFT.ADDDOC": lambda resp: str_if_bytes(resp),
     "TFT.MADDDOC": bool_ok,
-    "TFT.DELDOC": lambda resp: int(resp.decode()),
+    "TFT.DELDOC": lambda resp: int(resp),
     "TFT.UPDATEDOCFIELD": bool_ok,
-    "TFT.INCRFLOATDOCFIELD": lambda resp: float(resp.decode()),
-    "TFT.GETDOC": lambda resp: None if resp is None else resp.decode(),
+    "TFT.INCRFLOATDOCFIELD": lambda resp: float(resp),
+    "TFT.GETDOC": lambda resp: None if resp is None else str_if_bytes(resp),
     "TFT.SCANDOCID": lambda resp: ScandocidResult(
-        resp[0].decode(), [i.decode() for i in resp[1]]
+        str_if_bytes(resp[0]), [str_if_bytes(i) for i in resp[1]]
     ),
     "TFT.DELALL": bool_ok,
-    "TFT.SEARCH": lambda resp: resp.decode(),
-    "TFT.GETSUG": lambda resp: [i.decode() for i in resp],
-    "TFT.GETALLSUGS": lambda resp: [i.decode() for i in resp],
+    "TFT.SEARCH": lambda resp: str_if_bytes(resp),
+    "TFT.GETSUG": lambda resp: [str_if_bytes(i) for i in resp],
+    "TFT.GETALLSUGS": lambda resp: [str_if_bytes(i) for i in resp],
     # TairDoc
-    "JSON.SET": lambda resp: None if resp is None else resp == b"OK",
+    "JSON.SET": lambda resp: None if resp is None else bool_ok(resp),
     "JSON.TYPE": str_if_bytes,
     # TairTs
     "EXTS.P.CREATE": bool_ok,
@@ -130,18 +127,16 @@ TAIR_RESPONSE_CALLBACKS = {
     "EXTS.S.RAW_MINCRBY": lambda resp: [bool_ok(i) for i in resp],
     # TairCpc
     "CPC.UPDATE": bool_ok,
-    "CPC.ESTIMATE": lambda resp: float(resp.decode()),
-    "CPC.UPDATE2EST": lambda resp: float(resp.decode()),
-    "CPC.UPDATE2JUD": lambda resp: CpcUpdate2judResult(
-        float(resp[0].decode()), float(resp[1].decode())
-    ),
+    "CPC.ESTIMATE": lambda resp: float(resp),
+    "CPC.UPDATE2EST": lambda resp: float(resp),
+    "CPC.UPDATE2JUD": lambda resp: CpcUpdate2judResult(float(resp[0]), float(resp[1])),
     "CPC.ARRAY.UPDATE": bool_ok,
-    "CPC.ARRAY.ESTIMATE": lambda resp: float(resp.decode()),
-    "CPC.ARRAY.ESTIMATE.RANGE": lambda resp: [float(i.decode()) for i in resp],
-    "CPC.ARRAY.ESTIMATE.RANGE.MERGE": lambda resp: float(resp.decode()),
-    "CPC.ARRAY.UPDATE2EST": lambda resp: float(resp.decode()),
+    "CPC.ARRAY.ESTIMATE": lambda resp: float(resp),
+    "CPC.ARRAY.ESTIMATE.RANGE": lambda resp: [float(i) for i in resp],
+    "CPC.ARRAY.ESTIMATE.RANGE.MERGE": lambda resp: float(resp),
+    "CPC.ARRAY.UPDATE2EST": lambda resp: float(resp),
     "CPC.ARRAY.UPDATE2JUD": lambda resp: CpcUpdate2judResult(
-        float(resp[0].decode()), float(resp[1].decode())
+        float(resp[0]), float(resp[1])
     ),
     # TairVector
     "TVS.CREATEINDEX": bool_ok,

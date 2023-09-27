@@ -6,7 +6,7 @@ import pytest
 
 from tair import DataError, ExcasResult, ExgetResult, ResponseError, Tair
 
-from .conftest import NETWORK_DELAY_CALIBRATION_VALUE, get_server_time
+from .conftest import NETWORK_DELAY_CALIBRATION_VALUE, compare_str, get_server_time
 
 
 class TestTairString:
@@ -16,7 +16,7 @@ class TestTairString:
 
         assert t.exset(key, value)
         result = t.exget(key)
-        assert result.value == value.encode()
+        assert compare_str(result.value, value.encode())
         assert result.version == 1
 
     def test_exset_ex(self, t: Tair):
@@ -119,7 +119,7 @@ class TestTairString:
         assert t.exset(key, value1)
         assert t.exset(key, value2, ver=1)
         result = t.exget(key)
-        assert result.value == value2.encode()
+        assert compare_str(result.value, value2)
         assert result.version == 2
 
     def test_exset_abs(self, t: Tair):
@@ -128,7 +128,7 @@ class TestTairString:
 
         assert t.exset(key, value, abs=10)
         result = t.exget(key)
-        assert result.value == value.encode()
+        assert compare_str(result.value, value)
         assert result.version == 10
 
     def test_exsetver(self, t: Tair):
@@ -139,7 +139,7 @@ class TestTairString:
         assert t.exset(key1, value)
         assert t.exsetver(key1, 10) == 1
         result = t.exget(key1)
-        assert result.value == value.encode()
+        assert compare_str(result.value, value)
         assert result.version == 10
 
         # if the key does not exists, exsetver will return 0.
@@ -151,7 +151,7 @@ class TestTairString:
         assert t.exset(key, 10)
         assert t.exincrby(key, 20) == 30
         result = t.exget(key)
-        assert result.value == b"30"
+        assert compare_str(result.value, "30")
         assert result.version == 2
 
     def test_exincrby_ex(self, t: Tair):
@@ -234,13 +234,13 @@ class TestTairString:
 
         assert t.exincrby(key1, 20, nx=True) == 20
         result = t.exget(key1)
-        assert result.value == b"20"
+        assert compare_str(result.value, "20")
         assert result.version == 1
 
         assert t.exset(key2, 10)
         assert t.exincrby(key2, 20, nx=True) is None
         result = t.exget(key2)
-        assert result.value == b"10"
+        assert compare_str(result.value, "10")
         assert result.version == 1
 
     def test_exincrby_xx(self, t: Tair):
@@ -253,7 +253,7 @@ class TestTairString:
         assert t.exset(key2, 10)
         assert t.exincrby(key2, 20, xx=True) == 30
         result = t.exget(key2)
-        assert result.value == b"30"
+        assert compare_str(result.value, "30")
         assert result.version == 2
 
     def test_exincrby_ver(self, t: Tair):
@@ -262,7 +262,7 @@ class TestTairString:
         assert t.exset(key, 10)
         assert t.exincrby(key, 20, ver=1) == 30
         result = t.exget(key)
-        assert result.value == b"30"
+        assert compare_str(result.value, "30")
         assert result.version == 2
 
         assert t.exset(key, 10)
@@ -275,7 +275,7 @@ class TestTairString:
         assert t.exset(key, 10)
         assert t.exincrby(key, 20, abs=100) == 30
         result = t.exget(key)
-        assert result.value == b"30"
+        assert compare_str(result.value, "30")
         assert result.version == 100
 
     def test_exincrby_overflow(self, t: Tair):
@@ -436,11 +436,11 @@ class TestTairString:
 
         assert t.exset(key, value1)
         excas_result = t.excas(key, value2, 1)
-        assert excas_result.msg == "OK"
-        assert excas_result.value == b""
+        assert compare_str(excas_result.msg, "OK")
+        assert compare_str(excas_result.value, "")
         assert excas_result.version == 2
         exget_result = t.exget(key)
-        assert exget_result.value == value2.encode()
+        assert compare_str(exget_result.value, value2)
         assert exget_result.version == 2
 
     def test_excas_failed(self, t: Tair):
@@ -450,8 +450,8 @@ class TestTairString:
 
         assert t.exset(key, value1)
         result = t.excas(key, value2, 100)
-        assert result.msg == "CAS_FAILED"
-        assert result.value == value1.encode()
+        assert compare_str(result.msg, "CAS_FAILED")
+        assert compare_str(result.value, value1)
         assert result.version == 1
 
     def test_excas_not_exists(self, t: Tair):
