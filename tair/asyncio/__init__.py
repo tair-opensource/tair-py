@@ -5,7 +5,7 @@ from redis.asyncio.connection import (
     SSLConnection,
     UnixDomainSocketConnection,
 )
-from redis.asyncio.parser import CommandsParser
+
 from redis.asyncio.sentinel import (
     Sentinel,
     SentinelConnectionPool,
@@ -42,7 +42,6 @@ __all__ = [
     "BlockingConnectionPool",
     "BusyLoadingError",
     "ChildDeadlockedError",
-    "CommandsParser",
     "Connection",
     "ConnectionError",
     "ConnectionPool",
@@ -57,7 +56,6 @@ __all__ = [
     "SentinelManagedConnection",
     "SentinelManagedSSLConnection",
     "SSLConnection",
-    "StrictRedis",
     "TimeoutError",
     "UnixDomainSocketConnection",
     "WatchError",
