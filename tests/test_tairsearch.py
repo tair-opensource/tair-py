@@ -1,4 +1,5 @@
 import json
+import re
 import uuid
 
 import pytest
@@ -151,6 +152,37 @@ class TestTairSearch:
 
         assert t.tft_createindex(index, mappings)
         assert t.tft_adddoc(index, document, doc_id="00001") == '{"_id":"00001"}'
+
+        result = t.tft_explainscore(index, '{"query":{"term":{"product_id":"product test"}}}')
+        assert re.sub(r'(("(max)?_?score|\{"value)"):\d+(\.\d+)?', r'\1:0', result.decode('utf-8')) == \
+               '{"hits":{"hits":[{"_id":"00001","_index":"' + \
+               index + \
+               '","_score":0,"_source":{"product_id":"product ' \
+               'test"},"_explanation":{"score":0,"description":"score, computed as ' \
+               'query_boost * idf * idf * tf","field":"product_id","term":"product ' \
+               'test","query_boost":1.0,"details":[{"value":0,"description":"idf, computed ' \
+               'as 1 + log(N / (n + 1))","details":[{"value":0,"description":"n, number of ' \
+               'documents containing term"},{"value":0,"description":"N, total number of ' \
+               'documents"}]},{"value":0,"description":"tf, computed as sqrt(freq) / ' \
+               'sqrt(dl)","details":[{"value":0,"description":"freq, occurrences of term ' \
+               'within document"},{"value":0,"description":"dl, length of ' \
+               'field"}]}]}}],"max_score":0,"total":{"relation":"eq","value":1}}}'
+
+        result = t.tft_explainscore(index, '{"query":{"term":{"product_id":"product test"}}}', ['0', '00001', '1'])
+        assert re.sub(r'(("(max)?_?score|\{"value)"):\d+(\.\d+)?', r'\1:0', result.decode('utf-8')) == \
+               '{"hits":{"hits":[{"_id":"00001","_index":"' + \
+               index + \
+               '","_score":0,"_source":{"product_id":"product ' \
+               'test"},"_explanation":{"score":0,"description":"score, computed as ' \
+               'query_boost * idf * idf * tf","field":"product_id","term":"product ' \
+               'test","query_boost":1.0,"details":[{"value":0,"description":"idf, computed ' \
+               'as 1 + log(N / (n + 1))","details":[{"value":0,"description":"n, number of ' \
+               'documents containing term"},{"value":0,"description":"N, total number of ' \
+               'documents"}]},{"value":0,"description":"tf, computed as sqrt(freq) / ' \
+               'sqrt(dl)","details":[{"value":0,"description":"freq, occurrences of term ' \
+               'within document"},{"value":0,"description":"dl, length of ' \
+               'field"}]}]}}],"max_score":0,"total":{"relation":"eq","value":1}}}'
+
         assert t.tft_adddoc(index, document)
         t.delete(index)
 
@@ -282,8 +314,8 @@ class TestTairSearch:
         assert t.tft_adddoc(index, document, doc_id="00001") == '{"_id":"00001"}'
         assert t.tft_getdoc(index, "00002") is None
         assert (
-            t.tft_getdoc(index, "00001")
-            == '{"_id":"00001","_source":{"product_id":"test1","price":1.1}}'
+                t.tft_getdoc(index, "00001")
+                == '{"_id":"00001","_source":{"product_id":"test1","price":1.1}}'
         )
         t.delete(index)
 
@@ -558,8 +590,8 @@ class TestTairSearch:
         index = "idx_" + str(uuid.uuid4())
 
         assert (
-            t.tft_addsug(index, {"redis is a memory database": 3, "redis cluster": 10})
-            == 2
+                t.tft_addsug(index, {"redis is a memory database": 3, "redis cluster": 10})
+                == 2
         )
         t.delete(index)
 
@@ -567,8 +599,8 @@ class TestTairSearch:
         index = "idx_" + str(uuid.uuid4())
 
         assert (
-            t.tft_addsug(index, {"redis is a memory database": 3, "redis cluster": 10})
-            == 2
+                t.tft_addsug(index, {"redis is a memory database": 3, "redis cluster": 10})
+                == 2
         )
         assert t.tft_delsug(index, ("redis is a memory database", "redis cluster")) == 2
         t.delete(index)
@@ -577,8 +609,8 @@ class TestTairSearch:
         index = "idx_" + str(uuid.uuid4())
 
         assert (
-            t.tft_addsug(index, {"redis is a memory database": 3, "redis cluster": 10})
-            == 2
+                t.tft_addsug(index, {"redis is a memory database": 3, "redis cluster": 10})
+                == 2
         )
         assert t.tft_sugnum(index) == 2
         t.delete(index)
@@ -587,8 +619,8 @@ class TestTairSearch:
         index = "idx_" + str(uuid.uuid4())
 
         assert (
-            t.tft_addsug(index, {"redis is a memory database": 3, "redis cluster": 10})
-            == 2
+                t.tft_addsug(index, {"redis is a memory database": 3, "redis cluster": 10})
+                == 2
         )
         assert sorted(t.tft_getsug(index, "res", max_count=2, fuzzy=True)) == [
             "redis cluster",
@@ -600,8 +632,8 @@ class TestTairSearch:
         index = "idx_" + str(uuid.uuid4())
 
         assert (
-            t.tft_addsug(index, {"redis is a memory database": 3, "redis cluster": 10})
-            == 2
+                t.tft_addsug(index, {"redis is a memory database": 3, "redis cluster": 10})
+                == 2
         )
         assert sorted(t.tft_getallsugs(index)) == [
             "redis cluster",
@@ -629,6 +661,6 @@ class TestTairSearch:
 
     def test_scandocid_result_repr(self):
         assert (
-            str(ScandocidResult("10", ["00001", "00002", "00003"]))
-            == f"{{cursor: 10, doc_ids: ['00001', '00002', '00003']}}"
+                str(ScandocidResult("10", ["00001", "00002", "00003"]))
+                == f"{{cursor: 10, doc_ids: ['00001', '00002', '00003']}}"
         )

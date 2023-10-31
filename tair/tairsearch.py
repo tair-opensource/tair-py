@@ -185,6 +185,19 @@ class TairSearchCommands(CommandsProtocol):
         pieces: List[EncodableT] = [index, query]
         return self.execute_command("TFT.EXPLAINCOST", *pieces)
 
+    def tft_explainscore(
+        self,
+        index: KeyT,
+        request: str,
+        docid: Iterable[str] = []
+    ) -> ResponseT:
+        return self.execute_command(
+            "TFT.EXPLAINSCORE",
+            index,
+            request,
+            *docid,
+        )
+
     def tft_addsug(self, index: KeyT, mapping: Dict[str, int]) -> ResponseT:
         pieces: List[EncodableT] = [index]
 
