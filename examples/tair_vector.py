@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 from random import random
-
+import time
 from conf_examples import get_tair
-
 from tair import ResponseError
+from tair.tairvector import DistanceMetric, IndexType
 
 dim = 4
 queries = [[random() for _ in range(dim)] for _ in range(2)]
@@ -107,6 +107,57 @@ def mindexmknnsearch():
         print(e)
         return None
 
+def ttl(index_name:str):
+    try:
+        tair = get_tair()
+        tair.tvs_hset(index_name, "key_ttl", vector=[random() for _ in range(dim)])
+        tair.tvs_hset(index_name, "key_ttl2", vector=[random() for _ in range(dim)])
+        tair.tvs_hset(index_name, "key_ttl3", vector=[random() for _ in range(dim)])
+        tair.tvs_hset(index_name, "key_ttl4", vector=[random() for _ in range(dim)])
+        # set relative expiration time: s
+        tair.tvs_hexpire(index_name, "key_ttl", 5)
+        tair.tvs_httl(index_name, "key_ttl")
+        # set relative expiration time: ms
+        tair.tvs_hpexpire(index_name, "key_ttl2", 5000)
+        tair.tvs_hpttl(index_name, "key_ttl2")
+        # set absolute expiration time: s
+        abs_expire = int(time.time()) + 5
+        tair.tvs_hexpireat(index_name, "key_ttl3", abs_expire)
+        tair.tvs_hexpiretime(index_name, "key_ttl3")
+        tair.tvs_httl(index_name, "key_ttl3")
+        # set absolute expiration time: ms
+        abs_expire = int(time.time() * 1000) + 100
+        tair.tvs_hpexpireat(index_name, "key_ttl4", abs_expire)
+        tair.tvs_hpexpiretime(index_name, "key_ttl4")    
+    except ResponseError as e:
+        print(e)
+        return None
+    
+def hybrid_search(index_name:str):
+    try:
+        tair = get_tair()
+        kwargs = {"lexical_algorithm":"bm25"}
+        # create hybrid_search index
+        tair.tvs_create_index(index_name, dim=dim, distance_type=DistanceMetric.L2, index_type=IndexType.HNSW, **kwargs)
+        # init data
+        vectors = [[i, i, i, i] for i in range(1, 4)]
+        texts = [{"TEXT": "Turtle Check Men Navy Blue Shirt"}, {"TEXT":"Peter England Men Party Blue Jeans"}, {"TEXT": "Titan Women Silver Watch"}]
+        for i in range(3):
+            tair.tvs_hset(index=index_name, key=str.format("key{}",i), vector=vectors[i], is_binary=False, **texts[i])
+        search_text = "Women Watch"
+        search_vector = "[1,1,1,0]"
+        # hybrid_ratio 0: only text search; 0.5: vector and text hybrid search; 1: only vector search
+        hybrid_ratios = [0, 0.5, 1]
+        for hybrid_ratio in hybrid_ratios:
+            kwargs = {"TEXT": search_text, "hybrid_ratio": hybrid_ratio}   
+            # only text search:              [(b'key2', 0.9843749403953552), (b'key0', 61.000003814697266), (b'key1', 62.0)]
+            # vector and text hybrid search: [(b'key2', 30.991933822631836), (b'key0', 61.000003814697266), (b'key1', 62.0)]
+            # only vector search:            [(b'key0', 61.000003814697266), (b'key1', 62.0), (b'key2', 62.99993133544922)]
+            tair.tvs_knnsearch(index=index_name, k=10, vector=search_vector, is_binary=False, filter_str=None, **kwargs)
+    except ResponseError as e:
+        print(e)
+        return None
+
 # delete an index
 # @param index_name the name of index
 # @return success: True, fail: False.
@@ -130,4 +181,6 @@ if __name__ == "__main__":
     mknnsearch("test")
     mindexknnsearch()
     mindexmknnsearch()
+    ttl("test")
+    hybrid_search("hybrid_search_test")
     delete_index("test")
