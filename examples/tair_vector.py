@@ -7,6 +7,8 @@ from tair.tairvector import DistanceMetric, IndexType
 
 dim = 4
 queries = [[random() for _ in range(dim)] for _ in range(2)]
+total_count = 20
+vector_ids = [str(i) for i in range(1, total_count + 1)]
 
 # create an index
 # @param index_name the name of index
@@ -157,6 +159,40 @@ def hybrid_search(index_name:str):
     except ResponseError as e:
         print(e)
         return None
+    
+# tvs.hset using pipeline
+def pipeline_hset(index_name:str):
+    tair = get_tair()
+    pipeline = tair.pipeline(transaction=False)
+    for i in range(total_count):
+        vec_random = [random() for _ in range(dim)]
+        attrs = {"flag" : i+1}
+        pipeline.tvs_hset(index=index_name, key=vector_ids[i], vector=vec_random, is_binary=False, **attrs)
+    results = pipeline.execute(raise_on_error=False)
+    for result in results:
+        try:
+            # the return format of tvs.hset is the same as hset. It returns the number of successfully written attributes. 
+            # if an attribute is overwritten, 0 is returned.
+            # you can refer to tair/commands.py to query the return result format of each command.
+            print(int(result))
+        except Exception as e:
+            print(result)
+    
+# tvs.hgetall using pipeline
+def pipeline_hgetall(index_name:str):
+    tair = get_tair()
+    pipeline = tair.pipeline(transaction=False)
+    for id in vector_ids:
+        pipeline.tvs_hgetall(index=index_name,  key=id)
+    results = pipeline.execute(raise_on_error=False)
+    for result in results:
+        # you can refer to tair/commands.py to query the return result format of each command.
+        try:
+            for key,value in result.items():
+                print(f"{key}: {value}", end="\t")
+            print("")
+        except Exception as e:
+            print(e) 
 
 # delete an index
 # @param index_name the name of index
@@ -183,4 +219,9 @@ if __name__ == "__main__":
     mindexmknnsearch()
     ttl("test")
     hybrid_search("hybrid_search_test")
+    pipeline_hset("test")
+    pipeline_hgetall("test")
     delete_index("test")
+    delete_index("test2")
+    delete_index("hybrid_search_test")
+    
